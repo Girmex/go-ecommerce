@@ -1,6 +1,9 @@
 package service
 
 import (
+	"errors"
+	"time"
+
 	"github.com/Girmex/go-ecommerce/internal/domain"
 	"github.com/Girmex/go-ecommerce/internal/dto"
 	"github.com/Girmex/go-ecommerce/internal/helper"
@@ -62,13 +65,58 @@ func (s UserService) GetVerificationCode(e domain.User) (int, error){
 
 	//generate verification
 
+	code, err := s.Auth.GenerateCode()
+	if err != nil{
+		return 0, nil
+	}
+	user := domain.User{
+        Expiry: time.Now().Add(30 * time.Minute),
+		Code: code,
+	}
+
+
+
 	//update the user to verified
+
+  _, err = s.Repo.UpdateUser(e.ID, user)
+  if err !=nil{
+	return 0, errors.New("unable to update verification code")
+  }
+// send SMS
+
 
 	//return the verification code
 
-	return 0, nil
+	return code, nil
 }
 func (s UserService) VerifyCode(id uint, code int) error{
+
+	if s.IsVerifiedUser(id){
+		return errors.New("user is already verified!")
+	}
+
+	user, err := s.Repo.FindUserById(id)
+
+	if err!= nil{
+		return err
+	}
+
+	if user.Code != code {
+		return errors.New("Verification code does not match!")
+	}
+
+	if !time.Now().Before(user.Expiry){
+		return errors.New("Verification code expired")
+
+	}
+
+	updateUser := domain.User{
+		Verified:true,
+	}
+	 _, err = s.Repo.UpdateUser(id, updateUser)
+	 if err !=nil{
+		return errors.New("unable to verify user!")
+	 }
 
 	return nil
 }
