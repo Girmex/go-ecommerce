@@ -2,17 +2,20 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"time"
-
+	"github.com/Girmex/go-ecommerce/config"
 	"github.com/Girmex/go-ecommerce/internal/domain"
 	"github.com/Girmex/go-ecommerce/internal/dto"
 	"github.com/Girmex/go-ecommerce/internal/helper"
 	"github.com/Girmex/go-ecommerce/internal/repository"
+	"github.com/Girmex/go-ecommerce/pkg/notification"
 )
 
 type UserService struct{
 	Repo repository.UserRepository
 	Auth helper.Auth
+	Config config.AppConfig
 
 }
 
@@ -56,18 +59,18 @@ func(s UserService) IsVerifiedUser(id uint) bool{
 	return err !=nil && currentUser.Verified
 }
 
-func (s UserService) GetVerificationCode(e domain.User) (int, error){
+func (s UserService) GetVerificationCode(e domain.User) error{
 	//check if the user is already verified
  if s.IsVerifiedUser(e.ID){
-	return 0, nil
+	return nil
  }
 
 
 	//generate verification
 
-	code, err := s.Auth.GenerateCode()
+	code, err :=  s.Auth.GenerateCode()
 	if err != nil{
-		return 0, nil
+		return nil
 	}
 	user := domain.User{
         Expiry: time.Now().Add(30 * time.Minute),
@@ -80,14 +83,21 @@ func (s UserService) GetVerificationCode(e domain.User) (int, error){
 
   _, err = s.Repo.UpdateUser(e.ID, user)
   if err !=nil{
-	return 0, errors.New("unable to update verification code")
+	return errors.New("unable to update verification code")
   }
+
+  user, _ = s.Repo.FindUserById(e.ID)
 // send SMS
+msg :=fmt.Sprintf( "Your verification code is: %v " ,code)
 
-
+notificationClient := notification.NewNotificationClient(s.Config)
+ err = notificationClient.SendSMS(user.Phone, msg)
+ if err !=nil{
+	return errors.New("unable to update verification code")
+  }
 	//return the verification code
 
-	return code, nil
+	return nil
 }
 func (s UserService) VerifyCode(id uint, code int) error{
 

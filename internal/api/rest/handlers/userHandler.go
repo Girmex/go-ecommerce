@@ -22,6 +22,7 @@ func SetupUserRoutes(rh *rest.RestHandler) {
 	svc:=service.UserService{
 		Repo: repository.NewUserRepository(rh.DB),
 		Auth: rh.Auth,
+		Config: rh.Config,
 	}
 	handler:=UserHandler{
 		svc:svc,
@@ -103,7 +104,7 @@ func (h * UserHandler) GetVerificationCode(ctx *fiber.Ctx) error{
 
 	user:= h.svc.Auth.GetCurrentUser(ctx)
 
-	code, err := h.svc.GetVerificationCode(user)
+	err := h.svc.GetVerificationCode(user)
 	if err !=nil{
 		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
 			"message":"Unable to generate verification code",
@@ -112,7 +113,6 @@ func (h * UserHandler) GetVerificationCode(ctx *fiber.Ctx) error{
 
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message":"get verification code",
-		"data":code,
 	})
 }
 

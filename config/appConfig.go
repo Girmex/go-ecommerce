@@ -9,6 +9,9 @@ type AppConfig struct{
 	ServerPort string
 	Dsn string
 	AppSecret string
+	TwilioAccountSid string
+	TwilioAuthToken string
+	TwilioFromPhoneNumber string
 }
 
 func SetupEnv() (cfg AppConfig, err error){
@@ -32,5 +35,10 @@ func SetupEnv() (cfg AppConfig, err error){
 		return AppConfig{}, errors.New("app secret not found in the env variable")
 	}
 	 
-	return AppConfig{ServerPort: httpPort, Dsn:Dsn, AppSecret: appSecret},nil
+	return AppConfig{ServerPort: httpPort, Dsn:Dsn, AppSecret: appSecret,
+		TwilioAccountSid: os.Getenv("TWILIO_ACCOUNT_SID"),
+		TwilioAuthToken: os.Getenv("TWILIO_AUTH_TOKEN"),
+		TwilioFromPhoneNumber: os.Getenv("TWILIO_FROM_PHONE_NUMBER"),
+
+		},nil
 }

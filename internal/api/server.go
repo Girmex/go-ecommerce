@@ -33,6 +33,8 @@ func StartServer(config config.AppConfig){
 		App: app,
 		DB: db,
 		Auth: auth,
+		Config: config,
+
 
 	}
 
