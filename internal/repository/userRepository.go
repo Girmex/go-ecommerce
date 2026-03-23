@@ -16,6 +16,9 @@ type UserRepository interface{
 	FindUserById(id uint) (domain.User, error)
 	UpdateUser(id uint, u domain.User) (domain.User, error)
 
+	CreateBankAccount(e domain.BankAccount) error
+
+
 }
 
 type userRepository struct{
@@ -67,4 +70,8 @@ func (r userRepository) UpdateUser(id uint, u domain.User) (domain.User, error){
 		return domain.User{}, errors.New("user could not be updated")
 	}
 	return user, nil
+}
+
+func (r userRepository) CreateBankAccount(e domain.BankAccount) error {
+	return r.db.Create(&e).Error
 }
