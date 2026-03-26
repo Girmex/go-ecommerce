@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"log"
 	"net/http"
 
@@ -35,6 +36,9 @@ func SetupUserRoutes(rh *rest.RestHandler) {
     pvtRoutes := app.Group("/",rh.Auth.Authorize)
 	pvtRoutes.Post("/verify", handler.Verify)
 	pvtRoutes.Get("/verify", handler.GetVerificationCode)
+
+	pvtRoutes.Post("/cart", handler.AddToCart)
+	pvtRoutes.Get("/cart", handler.GetCart)
 
 
 }
@@ -161,5 +165,37 @@ func (h *UserHandler) BecomeSeller(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "become seller",
 		"token":   token,
+	})
+}
+
+func (h *UserHandler) AddToCart(ctx *fiber.Ctx) error {
+
+	req := dto.CreateCartRequest{}
+	if err := ctx.BodyParser(&req); err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "please provide a valid product and qty",
+		})
+	}
+
+	user := h.svc.Auth.GetCurrentUser(ctx)
+
+	// call user service and perform create cart
+	cartItems, err := h.svc.CreateCart(req, user)
+	if err != nil {
+		return rest.InternalError(ctx, err)
+	}
+
+	return rest.SuccessResponse(ctx, "cart created successfully", cartItems)
+
+}
+func (h *UserHandler) GetCart(ctx *fiber.Ctx) error {
+	user := h.svc.Auth.GetCurrentUser(ctx)
+	cart, _, err := h.svc.FindCart(user.ID)
+	if err != nil {
+		return rest.InternalError(ctx, errors.New("cart does not exist"))
+	}
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "get cart",
+		"cart":    cart,
 	})
 }

@@ -3,7 +3,9 @@ package service
 import (
 	"errors"
 	"fmt"
+	"log"
 	"time"
+
 	"github.com/Girmex/go-ecommerce/config"
 	"github.com/Girmex/go-ecommerce/internal/domain"
 	"github.com/Girmex/go-ecommerce/internal/dto"
@@ -14,6 +16,7 @@ import (
 
 type UserService struct{
 	Repo repository.UserRepository
+	CRepo  repository.CatalogRepository
 	Auth helper.Auth
 	Config config.AppConfig
 
@@ -181,14 +184,73 @@ func (s UserService) BecomeSeller(id uint, input dto.SellerInput) (string, error
 	return token, err
 }
 
-func (s UserService) FindCart(id uint) ([] interface{},error){
+func (s UserService) FindCart(id uint) ([]domain.Cart, float64, error) {
 
-	return nil, nil
+	cartItems, err := s.Repo.FindCartItems(id)
+
+	if err != nil {
+		return nil, 0, errors.New("error on finding cart items")
+	}
+
+	var totalAmount float64
+
+	for _, item := range cartItems {
+		totalAmount += item.Price * float64(item.Qty)
+	}
+
+	return cartItems, totalAmount, err
 }
 
-func (s UserService) Createcart(input any, u domain.User) ([] interface{},error){
+func (s UserService) CreateCart(input dto.CreateCartRequest, u domain.User) ([]domain.Cart, error) {
+	// check if the cart is Exist
+	cart, _ := s.Repo.FindCartItem(u.ID, input.ProductId)
 
-	return nil, nil
+	if cart.ID > 0 {
+		if input.ProductId == 0 {
+			return nil, errors.New("please provide a valid product id")
+		}
+		//  => delete the cart item
+		if input.Qty < 1 {
+			err := s.Repo.DeleteCartById(cart.ID)
+			if err != nil {
+				log.Printf("Error on deleting cart item %v", err)
+				return nil, errors.New("error on deleting cart item")
+			}
+		} else {
+			//  => update the cart item
+			cart.Qty = input.Qty
+			err := s.Repo.UpdateCart(cart)
+			if err != nil {
+				// log error
+				return nil, errors.New("error on updating cart item")
+			}
+		}
+
+	} else {
+		// check if product exist
+		product, _ := s.CRepo.FindProductById(int(input.ProductId))
+		if product.ID < 1 {
+			return nil, errors.New("product not found to create cart item")
+		}
+		// create cart
+
+		err := s.Repo.CreateCart(domain.Cart{
+			UserId:    u.ID,
+			ProductId: input.ProductId,
+			Name:      product.Name,
+			ImageUrl:  product.ImageUrl,
+			Qty:       input.Qty,
+			Price:     product.Price,
+			SellerId:  uint(product.UserId),
+		})
+
+		if err != nil {
+			return nil, errors.New("error on creating cart item")
+		}
+	}
+
+	return s.Repo.FindCartItems(u.ID)
+
 }
 
 func (s UserService) CreateOrder(u  domain.User) (int,error){
