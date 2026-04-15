@@ -15,9 +15,9 @@ import (
 )
 
 type UserService struct{
-	Repo repository.UserRepository
+	Repo   repository.UserRepository
 	CRepo  repository.CatalogRepository
-	Auth helper.Auth
+	Auth   helper.Auth
 	Config config.AppConfig
 
 }
@@ -134,18 +134,84 @@ func (s UserService) VerifyCode(id uint, code int) error{
 	return nil
 }
 
-func (s UserService) CreateProfile(input any) error{
+func (s UserService) CreateProfile(id uint, input dto.ProfileInput) error {
+
+	// update user
+	user, err := s.Repo.FindUserById(id)
+
+	if err != nil {
+		return err
+	}
+	if input.FirstName != "" {
+		user.FirstName = input.FirstName
+	}
+	if input.LastName != "" {
+		user.LastName = input.LastName
+	}
+
+	_, err = s.Repo.UpdateUser(id, user)
+
+	if err != nil {
+		return err
+	}
+
+	// create address
+	address := domain.Address{
+		AddressLine1: input.AddressInput.AddressLine1,
+		AddressLine2: input.AddressInput.AddressLine2,
+		City:         input.AddressInput.City,
+		Country:      input.AddressInput.Country,
+		PostCode:     input.AddressInput.PostCode,
+		UserId:       id,
+	}
+
+	err = s.Repo.CreateProfile(address)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func (s UserService) GetProfile(id uint) (*domain.User, error){
+func (s UserService) GetProfile(id uint) (*domain.User, error) {
 
-	return nil,nil
+	user, err := s.Repo.FindUserById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
 
-func (s UserService) UpdateProfile(id uint, input any) error{
+func (s UserService) UpdateProfile(id uint, input dto.ProfileInput) error {
 
+	// find the user
+	user, err := s.Repo.FindUserById(id)
+
+	if err != nil {
+		return err
+	}
+	if input.FirstName != "" {
+		user.FirstName = input.FirstName
+	}
+	if input.LastName != "" {
+		user.LastName = input.LastName
+	}
+
+	_, err = s.Repo.UpdateUser(id, user)
+	address := domain.Address{
+		AddressLine1: input.AddressInput.AddressLine1,
+		AddressLine2: input.AddressInput.AddressLine2,
+		City:         input.AddressInput.City,
+		Country:      input.AddressInput.Country,
+		PostCode:     input.AddressInput.PostCode,
+		UserId:       id,
+	}
+
+	err = s.Repo.UpdateProfile(address)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

@@ -26,6 +26,10 @@ type UserRepository interface{
 	DeleteCartById(id uint) error
 	DeleteCartItems(uId uint) error
 
+	// Profile
+	CreateProfile(e domain.Address) error
+	UpdateProfile(e domain.Address) error
+
 
 }
 
@@ -114,4 +118,23 @@ func (r userRepository) DeleteCartById(id uint) error {
 func (r userRepository) DeleteCartItems(uId uint) error {
 	err := r.db.Where("user_id=?", uId).Delete(&domain.Cart{}).Error
 	return err
+}
+func (r userRepository) CreateProfile(e domain.Address) error {
+	err := r.db.Create(&e).Error
+	if err != nil {
+		log.Printf("error on creating profile with address %v", err)
+		return errors.New("failed to create profile")
+	}
+	return nil
+}
+
+func (r userRepository) UpdateProfile(e domain.Address) error {
+
+	err := r.db.Where("user_id=?", e.UserId).Updates(e).Error
+	if err != nil {
+		log.Printf("error on update profile with address %v", err)
+		return errors.New("failed to create profile")
+	}
+	return nil
+
 }
