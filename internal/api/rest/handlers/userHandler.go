@@ -10,6 +10,8 @@ import (
 	"github.com/Girmex/go-ecommerce/internal/repository"
 	"github.com/Girmex/go-ecommerce/internal/service"
 	"github.com/gofiber/fiber/v2"
+	"strconv"
+
 )
 
 type UserHandler struct {
@@ -41,6 +43,10 @@ func SetupUserRoutes(rh *rest.RestHandler) {
 	pvtRoutes.Post("/profile", handler.CreateProfile)
 	pvtRoutes.Get("/profile", handler.GetProfile)
 	pvtRoutes.Patch("/profile", handler.UpdateProfile)
+
+	pvtRoutes.Post("/order", handler.CreateOrder)
+	pvtRoutes.Get("/order", handler.GetOrders)
+	pvtRoutes.Get("/order/:id", handler.GetOrder)
 
 	pvtRoutes.Post("/cart", handler.AddToCart)
 	pvtRoutes.Get("/cart", handler.GetCart)
@@ -131,7 +137,7 @@ func (h *UserHandler) Verify(ctx *fiber.Ctx) error {
 		})
 	}
 
-	err := h.svc.VerifyCode(user.ID, req.Code)
+	err := h.svc.VerifyCode(user.ID,req.Code)
 
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
@@ -264,5 +270,47 @@ func (h *UserHandler) GetCart(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "get cart",
 		"cart":    cart,
+	})
+}
+
+func (h *UserHandler) CreateOrder(ctx *fiber.Ctx) error {
+	user := h.svc.Auth.GetCurrentUser(ctx)
+
+	orderRef, err := h.svc.CreateOrder(user)
+	if err != nil {
+		return rest.InternalError(ctx, errors.New("Unable to create order!"))
+	}
+
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "order created successfuly",
+		"order":orderRef,
+	})
+}
+
+func (h *UserHandler) GetOrders(ctx *fiber.Ctx) error {
+	user := h.svc.Auth.GetCurrentUser(ctx)
+
+	orders, err := h.svc.GetOrders(user)
+	if err != nil {
+		return rest.InternalError(ctx, err)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "get orders",
+		"orders":  orders,
+	})
+}
+func (h *UserHandler) GetOrder(ctx *fiber.Ctx) error {
+	orderId, _ := strconv.Atoi(ctx.Params("id"))
+	user := h.svc.Auth.GetCurrentUser(ctx)
+
+	order, err := h.svc.GetOrderById(uint(orderId), user.ID)
+	if err != nil {
+		return rest.InternalError(ctx, err)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "get order by id",
+		"order":   order,
 	})
 }
