@@ -32,11 +32,11 @@ func SetupUserRoutes(rh *rest.RestHandler) {
 		svc:svc,
 	}
 
-	pubRoutes:= app.Group("/users")
+	pubRoutes:= app.Group("/")
 	pubRoutes.Post("/register", handler.Register)
 	pubRoutes.Post("/login", handler.Login)
 
-    pvtRoutes := app.Group("/",rh.Auth.Authorize)
+    pvtRoutes := app.Group("/users",rh.Auth.Authorize)
 	pvtRoutes.Post("/verify", handler.Verify)
 	pvtRoutes.Get("/verify", handler.GetVerificationCode)
 
@@ -273,19 +273,6 @@ func (h *UserHandler) GetCart(ctx *fiber.Ctx) error {
 	})
 }
 
-func (h *UserHandler) CreateOrder(ctx *fiber.Ctx) error {
-	user := h.svc.Auth.GetCurrentUser(ctx)
-
-	orderRef, err := h.svc.CreateOrder(user)
-	if err != nil {
-		return rest.InternalError(ctx, errors.New("Unable to create order!"))
-	}
-
-	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
-		"message": "order created successfuly",
-		"order":orderRef,
-	})
-}
 
 func (h *UserHandler) GetOrders(ctx *fiber.Ctx) error {
 	user := h.svc.Auth.GetCurrentUser(ctx)
