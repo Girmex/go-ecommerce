@@ -1,10 +1,10 @@
 package service
 
 import (
-	"go-ecommerce-app/internal/domain"
-	"go-ecommerce-app/internal/dto"
-	"go-ecommerce-app/internal/helper"
-	"go-ecommerce-app/internal/repository"
+	"github.com/Girmex/go-ecommerce/internal/domain"
+	"github.com/Girmex/go-ecommerce/internal/dto"
+	"github.com/Girmex/go-ecommerce/internal/helper"
+	"github.com/Girmex/go-ecommerce/internal/repository"
 )
 
 type TransactionService struct {

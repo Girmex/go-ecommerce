@@ -2,12 +2,12 @@ package api
 
 import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"go-ecommerce-app/config"
-	"go-ecommerce-app/internal/api/rest"
-	"go-ecommerce-app/internal/api/rest/handlers"
-	"go-ecommerce-app/internal/domain"
-	"go-ecommerce-app/internal/helper"
-	"go-ecommerce-app/pkg/payment"
+	"github.com/Girmex/go-ecommerce/config"
+	"github.com/Girmex/go-ecommerce/internal/api/rest"
+	"github.com/Girmex/go-ecommerce/internal/api/rest/handlers"
+	"github.com/Girmex/go-ecommerce/internal/domain"
+	"github.com/Girmex/go-ecommerce/internal/helper"
+	"github.com/Girmex/go-ecommerce/pkg/payment"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
