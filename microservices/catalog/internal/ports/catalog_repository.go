@@ -1,21 +1,25 @@
 package ports
 
-import "github.com/Girmex/go-ecommerce/microservices/catalog/internal/domain"
+import (
+	"context"
+
+	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/domain"
+)
 
 type CatalogRepository interface {
 
 	// Category
-	CreateCategory(category *domain.Category) error
-	UpdateCategory(category *domain.Category) (*domain.Category, error)
-	DeleteCategory(id uint) error
-	FindCategoryByID(id uint) (*domain.Category, error)
-	FindCategories() ([]*domain.Category, error)
+	CreateCategory(ctx context.Context, category *domain.Category) error
+	UpdateCategory(ctx context.Context, category *domain.Category) (*domain.Category, error)
+	DeleteCategory(ctx context.Context, id uint) error
+	FindCategoryByID(ctx context.Context, id uint) (*domain.Category, error)
+	FindCategories(ctx context.Context) ([]*domain.Category, error)
 
 	// Product
-	CreateProduct(product *domain.Product) error
-	UpdateProduct(product *domain.Product) (*domain.Product, error)
-	DeleteProduct(product *domain.Product) error
-	FindProductByID(id uint) (*domain.Product, error)
-	FindProducts() ([]*domain.Product, error)
-	FindSellerProducts(userID uint) ([]*domain.Product, error)
+	CreateProduct(ctx context.Context, product *domain.Product) error
+	UpdateProduct(ctx context.Context, product *domain.Product) (*domain.Product, error)
+	DeleteProduct(ctx context.Context, product *domain.Product) error
+	FindProductByID(ctx context.Context, id uint) (*domain.Product, error)
+	FindProducts(ctx context.Context) ([]*domain.Product, error)
+	FindSellerProducts(ctx context.Context, userID uint) ([]*domain.Product, error)
 }
