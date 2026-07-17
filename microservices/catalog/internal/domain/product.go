@@ -9,7 +9,7 @@ type Product struct {
 	CategoryID  uint
 	ImageURL    string
 	Price       float64
-	UserID      int
+	UserID      uint
 	Stock       uint
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
