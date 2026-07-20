@@ -3,12 +3,19 @@ package persistence
 import (
 	"context"
 
+	"errors"
+	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/adapters/persistence/models"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/domain"
 	"gorm.io/gorm"
 )
 
 type CatalogRepository struct {
 	db *gorm.DB
+}
+
+// DeleteProduct implements [ports.CatalogRepository].
+func (r *CatalogRepository) DeleteProduct(ctx context.Context, product *domain.Product) error {
+	panic("unimplemented")
 }
 
 func NewCatalogRepository(db *gorm.DB) *CatalogRepository {
@@ -70,23 +77,6 @@ func (r *CatalogRepository) UpdateCategory(
 	}
 
 	return toCategoryDomain(model), nil
-}
-func (repo *CatalogRepository) DeleteCategory(
-	ctx context.Context,
-	id uint,
-) error {
-
-	result := repo.db.WithContext(ctx).Delete(&models.CategoryModel{}, id)
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	if result.RowsAffected == 0 {
-		return domain.ErrCategoryNotFound
-	}
-
-	return nil
 }
 
 func (repo *CatalogRepository) FindCategoryByID(
@@ -163,26 +153,6 @@ func (repo *CatalogRepository) UpdateProduct(
 	}
 
 	return toProductDomain(model), nil
-}
-
-func (repo *CatalogRepository) DeleteProduct(
-	ctx context.Context,
-	product *domain.Product,
-) error {
-
-	result := repo.db.
-		WithContext(ctx).
-		Delete(&models.ProductModel{}, product.ID)
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	if result.RowsAffected == 0 {
-		return domain.ErrProductNotFound
-	}
-
-	return nil
 }
 
 func (repo *CatalogRepository) FindProductByID(

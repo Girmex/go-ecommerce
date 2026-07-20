@@ -15,6 +15,12 @@ func main() {
 	// Load configuration
 	cfg := config.Load()
 
+	log.Printf("Host=%q", cfg.PostgresHost)
+	log.Printf("Port=%q", cfg.PostgresPort)
+	log.Printf("User=%q", cfg.PostgresUser)
+	log.Printf("Password=%q", cfg.PostgresPassword)
+	log.Printf("Database=%q", cfg.PostgresDatabase)
+
 	// Connect PostgreSQL
 	db, err := database.NewPostgres(cfg)
 	if err != nil {
@@ -29,13 +35,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Repository
 	repository := persistence.NewCatalogRepository(db)
 
-	// Application Service
 	service := application.NewCatalogService(repository)
 
-	// Avoid unused variable until gRPC server is added
 	_ = service
 
 	log.Println("Catalog Service Started")

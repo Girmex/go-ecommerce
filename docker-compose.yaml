@@ -1,16 +1,55 @@
+version: "3.9"
+
 services:
   postgres:
-    image: postgres:latest
-    restart: always
+    image: postgres:17-alpine
+    container_name: ecommerce-postgres
+    restart: unless-stopped
+
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: online_shopping
+      POSTGRES_DB: catalog_db
+
     ports:
       - "5434:5432"
+
     volumes:
-      - db:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d catalog_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  catalog:
+    container_name: catalog-service
+
+    build:
+      context: .
+      dockerfile: microservices/catalog/Dockerfile
+
+    restart: unless-stopped
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      APP_NAME: Catalog Service
+      APP_ENV: development
+
+      GRPC_PORT: 50051
+
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: catalog_db
+
+    ports:
+      - "50051:50051"
 
 volumes:
-  db:
-    driver: local
+  postgres-data:
