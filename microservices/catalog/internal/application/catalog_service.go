@@ -2,7 +2,6 @@ package application
 
 import (
 	"context"
-
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/application/dto"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/domain"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/ports"

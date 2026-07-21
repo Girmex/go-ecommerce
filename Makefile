@@ -14,8 +14,15 @@ proto-catalog:
 		microservices/catalog/api/proto/catalog.proto
 
 run-catalog:
-	APP_ENV=dev go run ./microservices/catalog/cmd
-
+	APP_NAME="Catalog Service" \
+	APP_ENV=development \
+	GRPC_PORT=50051 \
+	POSTGRES_HOST=localhost \
+	POSTGRES_PORT=5434 \
+	POSTGRES_USER=root \
+	POSTGRES_PASSWORD=root \
+	POSTGRES_DB=catalog_db \
+	go run ./microservices/catalog/cmd
 build:
 	go build ./microservices/catalog/...
 

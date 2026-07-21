@@ -14,9 +14,6 @@ type CatalogRepository struct {
 }
 
 // DeleteProduct implements [ports.CatalogRepository].
-func (r *CatalogRepository) DeleteProduct(ctx context.Context, product *domain.Product) error {
-	panic("unimplemented")
-}
 
 func NewCatalogRepository(db *gorm.DB) *CatalogRepository {
 	return &CatalogRepository{
@@ -24,10 +21,8 @@ func NewCatalogRepository(db *gorm.DB) *CatalogRepository {
 	}
 }
 
-func (r *CatalogRepository) CreateCategory(
-	ctx context.Context,
-	category *domain.Category,
-) error {
+
+func (r *CatalogRepository) CreateCategory(ctx context.Context,category *domain.Category,) error {
 
 	model := toCategoryModel(category)
 
@@ -41,9 +36,7 @@ func (r *CatalogRepository) CreateCategory(
 	return nil
 }
 
-func (repo *CatalogRepository) FindCategories(
-	ctx context.Context,
-) ([]*domain.Category, error) {
+func (repo *CatalogRepository) FindCategories(ctx context.Context,) ([]*domain.Category, error) {
 
 	var models []models.CategoryModel
 
@@ -65,10 +58,7 @@ func (repo *CatalogRepository) FindCategories(
 	return categories, nil
 }
 
-func (r *CatalogRepository) UpdateCategory(
-	ctx context.Context,
-	category *domain.Category,
-) (*domain.Category, error) {
+func (r *CatalogRepository) UpdateCategory(ctx context.Context,category *domain.Category,) (*domain.Category, error) {
 
 	model := toCategoryModel(category)
 
@@ -224,4 +214,7 @@ func (repo *CatalogRepository) FindSellerProducts(
 	}
 
 	return products, nil
+}
+func (r *CatalogRepository) DeleteProduct(ctx context.Context, product *domain.Product) error {
+	panic("unimplemented")
 }
