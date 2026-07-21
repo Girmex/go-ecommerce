@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/application/dto"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/domain"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/ports"
@@ -20,7 +21,7 @@ func NewCatalogService(repository ports.CatalogRepository) *CatalogService {
 func (s *CatalogService) CreateCategory(
 	ctx context.Context,
 	input dto.CreateCategoryInput,
-) error {
+) (*domain.Category, error) {
 
 	category := &domain.Category{
 		Name:         input.Name,
@@ -29,7 +30,12 @@ func (s *CatalogService) CreateCategory(
 		DisplayOrder: input.DisplayOrder,
 	}
 
-	return s.repository.CreateCategory(ctx, category)
+	if err := s.repository.CreateCategory(ctx, category); err != nil {
+		return nil, err
+	}
+
+	// category now contains the generated ID
+	return category, nil
 }
 
 func (s *CatalogService) UpdateCategory(

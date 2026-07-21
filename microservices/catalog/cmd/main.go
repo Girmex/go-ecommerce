@@ -11,8 +11,8 @@ import (
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/application"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/config"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/database"
-
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -43,13 +43,17 @@ func main() {
 		server,
 		handler,
 	)
+	reflection.Register(server)
 
 	listener, err := net.Listen("tcp", ":"+cfg.GRPCPort)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Catalog Service Started")
-
+	log.Printf(
+		"%s started on :%s",
+		cfg.AppName,
+		cfg.GRPCPort,
+	)
 	if err := server.Serve(listener); err != nil {
 		log.Fatal(err)
 	}
