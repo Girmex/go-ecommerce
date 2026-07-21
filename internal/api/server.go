@@ -68,7 +68,7 @@ func StartServer(config config.AppConfig) {
 		DB:     db,
 		Auth:   auth,
 		Config: config,
-		Pc:     paymentClient,
+		PaymentClient: paymentClient,
 	}
 
 	setupRoutes(rh)

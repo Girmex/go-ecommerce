@@ -3,6 +3,7 @@ package rest
 import (
 	"github.com/Girmex/go-ecommerce/config"
 	"github.com/Girmex/go-ecommerce/internal/helper"
+	"github.com/Girmex/go-ecommerce/pkg/payment"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -11,4 +12,5 @@ type RestHandler struct {
 	DB *gorm.DB
 	Auth helper.Auth
 	Config config.AppConfig
+	PaymentClient payment.PaymentClient
 }

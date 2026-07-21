@@ -42,7 +42,7 @@ func SetupTransactionRoutes(as *rest.RestHandler) {
 
 	handler := TransactionHandler{
 		Svc:           svc,
-		PaymentClient: as.Pc,
+		PaymentClient: as.PaymentClient,
 		UserSvc:       useSvc,
 		Config:        as.Config,
 	}
