@@ -25,9 +25,9 @@ func (s *CatalogService) CreateCategory(
 
 	category := &domain.Category{
 		Name:         input.Name,
-		ParentID:     input.ParentID,
+		ParentID:     uint(input.ParentID),
 		ImageURL:     input.ImageURL,
-		DisplayOrder: input.DisplayOrder,
+		DisplayOrder: int(input.DisplayOrder),
 	}
 
 	if err := s.repository.CreateCategory(ctx, category); err != nil {
@@ -54,7 +54,7 @@ func (s *CatalogService) UpdateCategory(
 	}
 
 	if input.ParentID != nil {
-		category.ParentID = *input.ParentID
+		category.ParentID = uint(*input.ParentID)
 	}
 
 	if input.ImageURL != nil {
@@ -62,7 +62,7 @@ func (s *CatalogService) UpdateCategory(
 	}
 
 	if input.DisplayOrder != nil {
-		category.DisplayOrder = *input.DisplayOrder
+		category.DisplayOrder = int(*input.DisplayOrder)
 	}
 
 	return s.repository.UpdateCategory(ctx, category)
@@ -144,7 +144,7 @@ func (s *CatalogService) UpdateProduct(
 	}
 
 	if input.CategoryID != nil {
-		product.CategoryID = *input.CategoryID
+		product.CategoryID = uint(*input.CategoryID)
 	}
 
 	if input.ImageURL != nil {

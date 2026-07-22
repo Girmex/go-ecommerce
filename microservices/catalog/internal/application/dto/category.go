@@ -2,14 +2,14 @@ package dto
 
 type CreateCategoryInput struct {
 	Name         string
-	ParentID     uint
+	ParentID     uint32
 	ImageURL     string
-	DisplayOrder int
+	DisplayOrder int32
 }
 
 type UpdateCategoryInput struct {
 	Name         *string
-	ParentID     *uint
+	ParentID     *uint32
 	ImageURL     *string
-	DisplayOrder *int
+	DisplayOrder *int32
 }

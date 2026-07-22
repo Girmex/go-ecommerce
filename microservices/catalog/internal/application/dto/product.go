@@ -6,18 +6,18 @@ type CreateProductInput struct {
 	CategoryID  uint
 	ImageURL    string
 	Price       float64
-	Stock       int
+	Stock       int32
 }
 
 type UpdateProductInput struct {
 	Name        *string
 	Description *string
-	CategoryID  *uint
+	CategoryID  *uint32
 	ImageURL    *string
 	Price       *float64
-	Stock       *int
+	Stock       *int32
 }
 
 type UpdateStockInput struct {
-	Stock int
+	Stock int32
 }
