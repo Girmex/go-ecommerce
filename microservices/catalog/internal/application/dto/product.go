@@ -3,10 +3,10 @@ package dto
 type CreateProductInput struct {
 	Name        string
 	Description string
-	CategoryID  uint
+	CategoryID  uint32
 	ImageURL    string
 	Price       float64
-	Stock       int32
+	Stock       uint32
 }
 
 type UpdateProductInput struct {
@@ -15,9 +15,9 @@ type UpdateProductInput struct {
 	CategoryID  *uint32
 	ImageURL    *string
 	Price       *float64
-	Stock       *int32
+	Stock       *uint32
 }
 
 type UpdateStockInput struct {
-	Stock int32
+	Stock uint32
 }

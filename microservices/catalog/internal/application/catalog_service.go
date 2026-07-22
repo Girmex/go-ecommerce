@@ -25,9 +25,9 @@ func (s *CatalogService) CreateCategory(
 
 	category := &domain.Category{
 		Name:         input.Name,
-		ParentID:     uint(input.ParentID),
+		ParentID:     input.ParentID,
 		ImageURL:     input.ImageURL,
-		DisplayOrder: int(input.DisplayOrder),
+		DisplayOrder: input.DisplayOrder,
 	}
 
 	if err := s.repository.CreateCategory(ctx, category); err != nil {
@@ -54,7 +54,7 @@ func (s *CatalogService) UpdateCategory(
 	}
 
 	if input.ParentID != nil {
-		category.ParentID = uint(*input.ParentID)
+		category.ParentID = *input.ParentID
 	}
 
 	if input.ImageURL != nil {
@@ -62,7 +62,7 @@ func (s *CatalogService) UpdateCategory(
 	}
 
 	if input.DisplayOrder != nil {
-		category.DisplayOrder = int(*input.DisplayOrder)
+		category.DisplayOrder = *input.DisplayOrder
 	}
 
 	return s.repository.UpdateCategory(ctx, category)
@@ -103,8 +103,8 @@ func (s *CatalogService) GetCategoryByID(
 func (s *CatalogService) CreateProduct(
 	ctx context.Context,
 	input dto.CreateProductInput,
-	userID uint,
-) error {
+	userID uint32,
+) (*domain.Product, error) {
 
 	product := &domain.Product{
 		Name:        input.Name,
@@ -113,17 +113,21 @@ func (s *CatalogService) CreateProduct(
 		ImageURL:    input.ImageURL,
 		Price:       input.Price,
 		UserID:      userID,
-		Stock:       uint(input.Stock),
+		Stock:       input.Stock,
 	}
 
-	return s.repository.CreateProduct(ctx, product)
+	if err := s.repository.CreateProduct(ctx, product); err != nil {
+		return nil, err
+	}
+
+	return product, nil
 }
 
 func (s *CatalogService) UpdateProduct(
 	ctx context.Context,
 	id uint,
 	input dto.UpdateProductInput,
-	userID uint,
+	userID uint32,
 ) (*domain.Product, error) {
 
 	product, err := s.repository.FindProductByID(ctx, id)
@@ -144,7 +148,7 @@ func (s *CatalogService) UpdateProduct(
 	}
 
 	if input.CategoryID != nil {
-		product.CategoryID = uint(*input.CategoryID)
+		product.CategoryID = *input.CategoryID
 	}
 
 	if input.ImageURL != nil {
@@ -156,7 +160,7 @@ func (s *CatalogService) UpdateProduct(
 	}
 
 	if input.Stock != nil {
-		product.Stock = uint(*input.Stock)
+		product.Stock = *input.Stock
 	}
 
 	return s.repository.UpdateProduct(ctx, product)
@@ -165,7 +169,7 @@ func (s *CatalogService) UpdateProduct(
 func (s *CatalogService) DeleteProduct(
 	ctx context.Context,
 	id uint,
-	userID uint,
+	userID uint32,
 ) error {
 
 	product, err := s.repository.FindProductByID(ctx, id)
@@ -212,7 +216,7 @@ func (s *CatalogService) UpdateProductStock(
 	ctx context.Context,
 	id uint,
 	input dto.UpdateStockInput,
-	userID uint,
+	userID uint32,
 ) (*domain.Product, error) {
 
 	product, err := s.repository.FindProductByID(ctx, id)
@@ -224,7 +228,7 @@ func (s *CatalogService) UpdateProductStock(
 		return nil, domain.ErrUnauthorized
 	}
 
-	product.Stock = uint(input.Stock)
+	product.Stock = input.Stock
 
 	return s.repository.UpdateProduct(ctx, product)
 }
