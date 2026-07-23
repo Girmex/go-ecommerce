@@ -135,7 +135,7 @@ func (h *Handler) GetProduct(
 	return toProtoProduct(product), nil
 }
 
-func (h *Handler) ListProducts(
+func (h *Handler) GetProducts(
 	ctx context.Context, req *emptypb.Empty,
 ) (*proto.ListProductsResponse, error) {
 

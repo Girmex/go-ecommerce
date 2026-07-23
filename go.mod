@@ -7,7 +7,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/joho/godotenv v1.5.1
 	github.com/twilio/twilio-go v1.30.3
-	golang.org/x/crypto v0.50.0
+	golang.org/x/crypto v0.54.0
 	google.golang.org/grpc v1.82.1
 	google.golang.org/protobuf v1.36.11
 	gorm.io/driver/postgres v1.6.0
@@ -15,7 +15,7 @@ require (
 )
 
 require (
-	golang.org/x/net v0.53.0 // indirect
+	golang.org/x/net v0.56.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260414002931-afd174a4e478 // indirect
 )
 
@@ -40,7 +40,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.43.0 // indirect
-	golang.org/x/text v0.36.0 // indirect
+	golang.org/x/sync v0.22.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
+	golang.org/x/text v0.40.0 // indirect
 )

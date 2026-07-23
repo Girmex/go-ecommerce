@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package auth.v1;
+option go_package = "github.com/Girmex/go-ecommerce/microservices/auth/api/proto;proto";
+import "google/protobuf/empty.proto";
+
+message User {
+  uint32 id = 1;
+  string name = 2;
+  string email = 3;
+}
+
+message RegisterRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+}
+message RegisterResponse {
+  User user = 1;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+  User user = 3;
+}
+
+message LogoutRequest {
+  string refresh_token = 1;
+}
+
+message GetUserRequest {
+  uint32 id = 1;
+}
+
+message ValidateTokenRequest {
+  string access_token = 1;
+}
+
+message ValidateTokenResponse {
+  uint32 user_id = 1;
+  string email = 2;
+}
+
+service AuthService {
+
+  rpc Register(RegisterRequest)
+      returns (RegisterResponse);
+
+  rpc Login(LoginRequest)
+      returns (LoginResponse);
+
+  rpc GetUser(GetUserRequest)
+      returns (User);
+
+  rpc ValidateToken(ValidateTokenRequest)
+      returns (ValidateTokenResponse);
+
+  rpc Logout(LogoutRequest)
+    returns (google.protobuf.Empty);
+
+}
+
+
+
+

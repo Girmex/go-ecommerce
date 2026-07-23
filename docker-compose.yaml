@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: catalog_db
+      POSTGRES_DB: auth_db
 
     ports:
       - "5434:5432"
@@ -16,17 +16,17 @@ services:
       - postgres-data:/var/lib/postgresql/data
 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U root -d catalog_db"]
+      test: ["CMD-SHELL", "pg_isready -U root -d auth_db"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  catalog:
-    container_name: catalog-service
+  auth:
+    container_name: auth-service
 
     build:
       context: .
-      dockerfile: microservices/catalog/Dockerfile
+      dockerfile: microservices/auth/Dockerfile
 
     restart: unless-stopped
 
@@ -35,7 +35,7 @@ services:
         condition: service_healthy
 
     environment:
-      APP_NAME: Catalog Service
+      APP_NAME: Auth Service
       APP_ENV: development
 
       GRPC_PORT: 50051
@@ -44,8 +44,7 @@ services:
       POSTGRES_PORT: 5432
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: catalog_db
-
+      POSTGRES_DB: auth_db
     ports:
       - "50051:50051"
 

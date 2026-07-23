@@ -1,30 +1,31 @@
 .PHONY: \
-	proto-catalog \
-	run-catalog \
+	proto-auth \
+	run-auth \
 	build \
 	test
 
-proto-catalog:
+
+proto-auth:
 	protoc \
 		--proto_path=. \
 		--go_out=. \
 		--go_opt=paths=source_relative \
 		--go-grpc_out=. \
 		--go-grpc_opt=paths=source_relative \
-		microservices/catalog/api/proto/catalog.proto
+		microservices/auth/api/proto/auth.proto
 
-run-catalog:
-	APP_NAME="Catalog Service" \
+run-auth:
+	APP_NAME="Auth Service" \
 	APP_ENV=development \
-	GRPC_PORT=50051 \
+	GRPC_PORT=50052 \
 	POSTGRES_HOST=localhost \
 	POSTGRES_PORT=5434 \
 	POSTGRES_USER=root \
 	POSTGRES_PASSWORD=root \
-	POSTGRES_DB=catalog_db \
-	go run ./microservices/catalog/cmd
+	POSTGRES_DB=auth_db \
+	go run ./microservices/auth/cmd
 build:
-	go build ./microservices/catalog/...
+	go build ./microservices/auth/...
 
 test:
-	go test ./microservices/catalog/...
+	go test ./microservices/auth/...

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"errors"
+
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/adapters/persistence/models"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/domain"
 	"gorm.io/gorm"
@@ -21,8 +22,7 @@ func NewCatalogRepository(db *gorm.DB) *CatalogRepository {
 	}
 }
 
-
-func (r *CatalogRepository) CreateCategory(ctx context.Context,category *domain.Category,) error {
+func (r *CatalogRepository) CreateCategory(ctx context.Context, category *domain.Category) error {
 
 	model := toCategoryModel(category)
 
@@ -36,7 +36,7 @@ func (r *CatalogRepository) CreateCategory(ctx context.Context,category *domain.
 	return nil
 }
 
-func (repo *CatalogRepository) FindCategories(ctx context.Context,) ([]*domain.Category, error) {
+func (repo *CatalogRepository) FindCategories(ctx context.Context) ([]*domain.Category, error) {
 
 	var models []models.CategoryModel
 
@@ -58,7 +58,7 @@ func (repo *CatalogRepository) FindCategories(ctx context.Context,) ([]*domain.C
 	return categories, nil
 }
 
-func (r *CatalogRepository) UpdateCategory(ctx context.Context,category *domain.Category,) (*domain.Category, error) {
+func (r *CatalogRepository) UpdateCategory(ctx context.Context, category *domain.Category) (*domain.Category, error) {
 
 	model := toCategoryModel(category)
 
@@ -216,5 +216,5 @@ func (repo *CatalogRepository) FindSellerProducts(
 	return products, nil
 }
 func (r *CatalogRepository) DeleteProduct(ctx context.Context, product *domain.Product) error {
-	panic("unimplemented")
+	return r.db.WithContext(ctx).Delete(toProductModel(product)).Error
 }
