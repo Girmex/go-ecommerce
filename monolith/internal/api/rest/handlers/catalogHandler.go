@@ -2,11 +2,11 @@ package handlers
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/Girmex/go-ecommerce/internal/api/rest"
-	"github.com/Girmex/go-ecommerce/internal/domain"
-	"github.com/Girmex/go-ecommerce/internal/dto"
-	"github.com/Girmex/go-ecommerce/internal/repository"
-	"github.com/Girmex/go-ecommerce/internal/service"
+	"github.com/Girmex/go-ecommerce/monolith/internal/api/rest"
+	"github.com/Girmex/go-ecommerce/monolith/internal/domain"
+	"github.com/Girmex/go-ecommerce/monolith/internal/dto"
+	"github.com/Girmex/go-ecommerce/monolith/internal/repository"
+	"github.com/Girmex/go-ecommerce/monolith/internal/service"
 	"strconv"
 )
 

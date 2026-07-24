@@ -2,9 +2,10 @@ package repository
 
 import (
 	"errors"
-	"github.com/Girmex/go-ecommerce/internal/domain"
-	"gorm.io/gorm"
 	"log"
+
+	"github.com/Girmex/go-ecommerce/monolith/internal/domain"
+	"gorm.io/gorm"
 )
 
 type CatalogRepository interface {
@@ -24,6 +25,12 @@ type CatalogRepository interface {
 
 type catalogRepository struct {
 	db *gorm.DB
+}
+
+func NewCatalogRepository(db *gorm.DB) CatalogRepository {
+	return &catalogRepository{
+		db: db,
+	}
 }
 
 func (c catalogRepository) CreateProduct(e *domain.Product) error {
@@ -136,10 +143,4 @@ func (c catalogRepository) DeleteCategory(id int) error {
 
 	return nil
 
-}
-
-func NewCatalogRepository(db *gorm.DB) CatalogRepository {
-	return &catalogRepository{
-		db: db,
-	}
 }

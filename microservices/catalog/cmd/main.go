@@ -37,13 +37,13 @@ func main() {
 
 	service := application.NewCatalogService(repository)
 
-	handler := grpcadapter.NewHandler(service)
 	server := grpc.NewServer()
+	reflection.Register(server)
+	handler := grpcadapter.NewHandler(service)
 	proto.RegisterCatalogServiceServer(
 		server,
 		handler,
 	)
-	reflection.Register(server)
 
 	listener, err := net.Listen("tcp", ":"+cfg.GRPCPort)
 	if err != nil {

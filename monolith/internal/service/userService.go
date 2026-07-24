@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"log"
 	"time"
-	"github.com/Girmex/go-ecommerce/config"
-	"github.com/Girmex/go-ecommerce/internal/domain"
-	"github.com/Girmex/go-ecommerce/internal/dto"
-	"github.com/Girmex/go-ecommerce/internal/helper"
-	"github.com/Girmex/go-ecommerce/internal/repository"
-	"github.com/Girmex/go-ecommerce/pkg/notification"
+	"github.com/Girmex/go-ecommerce/monolith/config"
+	"github.com/Girmex/go-ecommerce/monolith/internal/domain"
+	"github.com/Girmex/go-ecommerce/monolith/internal/dto"
+	"github.com/Girmex/go-ecommerce/monolith/internal/helper"
+	"github.com/Girmex/go-ecommerce/monolith/internal/repository"
+	"github.com/Girmex/go-ecommerce/monolith/pkg/notification"
 )
 
 type UserService struct{

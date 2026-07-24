@@ -36,11 +36,11 @@ func (r *CatalogRepository) CreateCategory(ctx context.Context, category *domain
 	return nil
 }
 
-func (repo *CatalogRepository) FindCategories(ctx context.Context) ([]*domain.Category, error) {
+func (r *CatalogRepository) FindCategories(ctx context.Context) ([]*domain.Category, error) {
 
 	var models []models.CategoryModel
 
-	err := repo.db.
+	err := r.db.
 		WithContext(ctx).
 		Find(&models).Error
 

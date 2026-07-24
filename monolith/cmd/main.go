@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/Girmex/go-ecommerce/config"
-	"github.com/Girmex/go-ecommerce/internal/api"
+	"github.com/Girmex/go-ecommerce/monolith/config"
+	"github.com/Girmex/go-ecommerce/monolith/internal/api"
 )
 
 func main(){

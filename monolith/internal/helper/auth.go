@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Girmex/go-ecommerce/internal/domain"
+	"github.com/Girmex/go-ecommerce/monolith/internal/domain"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/bcrypt"

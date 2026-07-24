@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/twilio/twilio-go"
 	twilioApi "github.com/twilio/twilio-go/rest/api/v2010"
-	"github.com/Girmex/go-ecommerce/config"
+	"github.com/Girmex/go-ecommerce/monolith/config"
 )
 
 type NotificationClient interface {

@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"github.com/Girmex/go-ecommerce/internal/domain"
-	"github.com/Girmex/go-ecommerce/internal/dto"
+	"github.com/Girmex/go-ecommerce/monolith/internal/domain"
+	"github.com/Girmex/go-ecommerce/monolith/internal/dto"
 	"gorm.io/gorm"
 )
 

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"log"
 
-	"github.com/Girmex/go-ecommerce/internal/domain"
+	"github.com/Girmex/go-ecommerce/monolith/internal/domain"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
