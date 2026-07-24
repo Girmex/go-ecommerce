@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 
-	"github.com/Girmex/go-ecommerce/microservices/catalog/api/proto"
+	"github.com/Girmex/go-ecommerce/microservices/catalog/proto"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/application"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/application/dto"
 	"google.golang.org/protobuf/types/known/emptypb"

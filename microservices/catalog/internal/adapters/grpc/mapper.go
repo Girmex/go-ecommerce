@@ -1,8 +1,8 @@
 package grpc
 
 import (
-	"github.com/Girmex/go-ecommerce/microservices/catalog/api/proto"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/domain"
+	"github.com/Girmex/go-ecommerce/microservices/catalog/proto"
 )
 
 func toProtoCategory(category *domain.Category) *proto.Category {

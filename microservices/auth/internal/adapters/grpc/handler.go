@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 
-	"github.com/Girmex/go-ecommerce/microservices/auth/api/proto"
+	"github.com/Girmex/go-ecommerce/microservices/auth/proto"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/application"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/dto"
 )

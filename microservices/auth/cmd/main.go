@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/Girmex/go-ecommerce/microservices/auth/api/proto"
+	"github.com/Girmex/go-ecommerce/microservices/auth/proto"
 	grpcadapter "github.com/Girmex/go-ecommerce/microservices/auth/internal/adapters/grpc"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/adapters/persistence"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/adapters/persistence/models"
