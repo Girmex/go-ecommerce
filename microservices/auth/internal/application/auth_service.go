@@ -5,6 +5,7 @@ import (
 
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/domain"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/dto"
+	"github.com/Girmex/go-ecommerce/microservices/auth/internal/jwt"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/ports"
 	"golang.org/x/crypto/bcrypt"
 
@@ -13,11 +14,14 @@ import (
 
 type AuthService struct {
 	repository ports.AuthRepository
+	jwtManager *jwt.JWTManager
 }
 
-func NewAuthService(repository ports.AuthRepository) *AuthService {
+func NewAuthService(repository ports.AuthRepository, jwtManager *jwt.JWTManager,
+) *AuthService {
 	return &AuthService{
 		repository: repository,
+		jwtManager: jwtManager,
 	}
 }
 
@@ -72,8 +76,13 @@ func (s *AuthService) Login(
 
 		return nil, domain.ErrInvalidCredentials
 	}
+
+	accessToken, err := s.jwtManager.GenerateAccessToken(user)
+	if err != nil {
+		return nil, err
+	}
 	return &dto.LoginOutput{
-		AccessToken:  "dummy-access-token",
+		AccessToken:  accessToken,
 		RefreshToken: "dummy-refresh-token",
 		User:         user,
 	}, nil

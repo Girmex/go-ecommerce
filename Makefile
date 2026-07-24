@@ -23,6 +23,7 @@ run-auth:
 	POSTGRES_USER=root \
 	POSTGRES_PASSWORD=root \
 	POSTGRES_DB=auth_db \
+	JWT_SECRET="super-secret-key" \
 	go run ./microservices/auth/cmd
 build:
 	go build ./microservices/auth/...

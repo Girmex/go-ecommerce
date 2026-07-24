@@ -9,7 +9,7 @@ import (
 
 	"github.com/Girmex/go-ecommerce/monolith/internal/domain"
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 

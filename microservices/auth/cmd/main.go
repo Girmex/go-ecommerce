@@ -4,13 +4,14 @@ import (
 	"log"
 	"net"
 
-	"github.com/Girmex/go-ecommerce/microservices/auth/proto"
 	grpcadapter "github.com/Girmex/go-ecommerce/microservices/auth/internal/adapters/grpc"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/adapters/persistence"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/adapters/persistence/models"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/application"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/config"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/database"
+	"github.com/Girmex/go-ecommerce/microservices/auth/internal/jwt"
+	"github.com/Girmex/go-ecommerce/microservices/auth/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -34,8 +35,12 @@ func main() {
 
 	repository := persistence.NewAuthRepository(db)
 
-	service := application.NewAuthService(repository)
+	jwtManager := jwt.NewJWTManager(cfg.JWTSecret)
 
+	service := application.NewAuthService(
+		repository,
+		jwtManager,
+	)
 	handler := grpcadapter.NewHandler(service)
 
 	server := grpc.NewServer()
