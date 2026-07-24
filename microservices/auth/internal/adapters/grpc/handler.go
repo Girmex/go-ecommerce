@@ -39,3 +39,24 @@ func (h *Handler) Register(
 		User: toProtoUser(user),
 	}, nil
 }
+
+func (h *Handler) Login(
+	ctx context.Context,
+	req *proto.LoginRequest,
+) (*proto.LoginResponse, error) {
+
+	input := dto.LoginInput{
+		Email:    req.Email,
+		Password: req.Password,
+	}
+
+	output, err := h.service.Login(ctx, input)
+	if err != nil {
+		return nil, toStatusError(err)
+	}
+	return &proto.LoginResponse{
+		AccessToken:  output.AccessToken,
+		RefreshToken: output.RefreshToken,
+		User:         toProtoUser(output.User),
+	}, nil
+}

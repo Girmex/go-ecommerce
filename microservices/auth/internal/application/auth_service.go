@@ -1,6 +1,8 @@
 package application
 
 import (
+	"errors"
+
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/domain"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/dto"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/ports"
@@ -48,6 +50,33 @@ func (s *AuthService) Register(
 	}
 
 	return user, nil
+}
+
+func (s *AuthService) Login(
+	ctx context.Context,
+	input dto.LoginInput,
+) (*dto.LoginOutput, error) {
+
+	user, err := s.repository.GetUserByEmail(ctx, input.Email)
+	if err != nil {
+		if errors.Is(err, domain.ErrUserNotFound) {
+			return nil, domain.ErrInvalidCredentials
+		}
+
+		return nil, err
+	}
+	if err := bcrypt.CompareHashAndPassword(
+		[]byte(user.PasswordHash),
+		[]byte(input.Password),
+	); err != nil {
+
+		return nil, domain.ErrInvalidCredentials
+	}
+	return &dto.LoginOutput{
+		AccessToken:  "dummy-access-token",
+		RefreshToken: "dummy-refresh-token",
+		User:         user,
+	}, nil
 }
 
 func (s *AuthService) GetUserByID(ctx context.Context, id uint) (*domain.User, error) {
