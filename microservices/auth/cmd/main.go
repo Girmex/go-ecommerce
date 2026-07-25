@@ -10,7 +10,7 @@ import (
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/application"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/config"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/database"
-	"github.com/Girmex/go-ecommerce/microservices/auth/internal/jwt"
+	"github.com/Girmex/go-ecommerce/microservices/pkg/jwt"
 	"github.com/Girmex/go-ecommerce/microservices/auth/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"

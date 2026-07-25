@@ -206,10 +206,10 @@ func (s *CatalogService) GetProductByID(
 
 func (s *CatalogService) GetSellerProducts(
 	ctx context.Context,
-	userID uint,
+	userID uint32,
 ) ([]*domain.Product, error) {
 
-	return s.repository.FindSellerProducts(ctx, userID)
+	return s.repository.FindSellerProducts(ctx, uint(userID))
 }
 
 func (s *CatalogService) UpdateProductStock(

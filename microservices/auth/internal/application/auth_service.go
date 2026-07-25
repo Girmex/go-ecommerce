@@ -3,13 +3,13 @@ package application
 import (
 	"errors"
 
+	"context"
+
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/domain"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/dto"
-	"github.com/Girmex/go-ecommerce/microservices/auth/internal/jwt"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/ports"
+	"github.com/Girmex/go-ecommerce/microservices/pkg/jwt"
 	"golang.org/x/crypto/bcrypt"
-
-	"context"
 )
 
 type AuthService struct {
@@ -77,12 +77,15 @@ func (s *AuthService) Login(
 		return nil, domain.ErrInvalidCredentials
 	}
 
-	accessToken, err := s.jwtManager.GenerateAccessToken(user)
+	accessToken, err := s.jwtManager.GenerateAccessToken(
+		user.ID,
+		user.Email,
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	refreshToken, err := s.jwtManager.GenerateRefreshToken(user)
+	refreshToken, err := s.jwtManager.GenerateRefreshToken(user.ID, user.Email)
 	if err != nil {
 		return nil, err
 	}

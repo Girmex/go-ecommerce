@@ -11,6 +11,7 @@ type Config struct {
 	PostgresUser     string
 	PostgresPassword string
 	PostgresDatabase string
+	JWTSecret        string
 }
 
 func Load() *Config {
@@ -23,5 +24,6 @@ func Load() *Config {
 		PostgresUser:     os.Getenv("POSTGRES_USER"),
 		PostgresPassword: os.Getenv("POSTGRES_PASSWORD"),
 		PostgresDatabase: os.Getenv("POSTGRES_DB"),
+		JWTSecret:        os.Getenv("JWT_SECRET"),
 	}
 }

@@ -1,9 +1,9 @@
 package jwt
 
 import (
+	"errors"
 	"time"
 
-	"github.com/Girmex/go-ecommerce/microservices/auth/internal/domain"
 	jwtv5 "github.com/golang-jwt/jwt/v5"
 )
 
@@ -12,8 +12,8 @@ type JWTManager struct {
 }
 
 type Claims struct {
-	UserID uint
-	Email  string
+	UserID    uint
+	Email     string
 	TokenType string
 
 	jwtv5.RegisteredClaims
@@ -26,18 +26,19 @@ func NewJWTManager(secret string) *JWTManager {
 }
 
 func (j *JWTManager) GenerateAccessToken(
-	user *domain.User,
+	userID uint,
+	email string,
 ) (string, error) {
 
 	claims := Claims{
-		UserID: user.ID,
-		Email:  user.Email,
+		UserID:    userID,
+		Email:     email,
 		TokenType: "access",
 		RegisteredClaims: jwtv5.RegisteredClaims{
 			ExpiresAt: jwtv5.NewNumericDate(
 				time.Now().Add(15 * time.Minute),
 			),
-			IssuedAt: jwtv5.NewNumericDate(time.Now()),
+			IssuedAt:  jwtv5.NewNumericDate(time.Now()),
 			NotBefore: jwtv5.NewNumericDate(time.Now()),
 		},
 	}
@@ -51,18 +52,18 @@ func (j *JWTManager) GenerateAccessToken(
 }
 
 func (j *JWTManager) GenerateRefreshToken(
-	user *domain.User,
+	userID uint, email string,
 ) (string, error) {
 
 	claims := Claims{
-		UserID: user.ID,
-		Email:  user.Email,
+		UserID:    userID,
+		Email:     email,
 		TokenType: "refresh",
 		RegisteredClaims: jwtv5.RegisteredClaims{
 			ExpiresAt: jwtv5.NewNumericDate(
 				time.Now().Add(7 * 24 * time.Hour),
 			),
-			IssuedAt: jwtv5.NewNumericDate(time.Now()),
+			IssuedAt:  jwtv5.NewNumericDate(time.Now()),
 			NotBefore: jwtv5.NewNumericDate(time.Now()),
 		},
 	}
@@ -73,4 +74,34 @@ func (j *JWTManager) GenerateRefreshToken(
 	)
 
 	return token.SignedString(j.secret)
+}
+
+func (j *JWTManager) ValidateAccessToken(
+	tokenString string,
+) (*Claims, error) {
+	claims := &Claims{}
+
+	token, err := jwtv5.ParseWithClaims(
+		tokenString,
+		claims,
+		func(token *jwtv5.Token) (interface{}, error) {
+
+			// verify signing method
+			if _, ok := token.Method.(*jwtv5.SigningMethodHMAC); !ok {
+				return nil, errors.New("unexpected signing method")
+			}
+
+			return j.secret, nil
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	if !token.Valid {
+		return nil, errors.New("invalid token")
+	}
+	if claims.TokenType != "access" {
+		return nil, errors.New("invalid token type")
+	}
+	return claims, nil
 }

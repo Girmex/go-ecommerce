@@ -3,9 +3,12 @@ package grpc
 import (
 	"context"
 
-	"github.com/Girmex/go-ecommerce/microservices/catalog/proto"
+	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/adapters/grpc/middleware"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/application"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/application/dto"
+	"github.com/Girmex/go-ecommerce/microservices/catalog/proto"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -103,7 +106,13 @@ func (h *Handler) CreateProduct(
 	req *proto.CreateProductRequest,
 ) (*proto.Product, error) {
 
-	const userID uint32 = 1
+	userID, ok := middleware.UserID(ctx)
+	if !ok {
+		return nil, status.Error(
+			codes.Unauthenticated,
+			"user id missing",
+		)
+	}
 	input := dto.CreateProductInput{
 		Name:        req.Name,
 		Description: req.Description,
@@ -157,8 +166,13 @@ func (h *Handler) UpdateProduct(
 	req *proto.UpdateProductRequest,
 ) (*proto.Product, error) {
 
-	const userID uint32 = 1
-
+	userID, ok := middleware.UserID(ctx)
+	if !ok {
+		return nil, status.Error(
+			codes.Unauthenticated,
+			"user id missing",
+		)
+	}
 	input := dto.UpdateProductInput{
 		Name:        req.Name,
 		Description: req.Description,
@@ -179,7 +193,14 @@ func (h *Handler) DeleteProduct(
 	req *proto.GetProductRequest,
 ) (*emptypb.Empty, error) {
 
-	const userID uint32 = 1
+	userID, ok := middleware.UserID(ctx)
+	if !ok {
+		return nil, status.Error(
+			codes.Unauthenticated,
+			"user id missing",
+		)
+	}
+
 	if err := h.service.DeleteProduct(ctx, uint(req.Id), userID); err != nil {
 		return nil, toStatusError(err)
 	}
@@ -190,7 +211,14 @@ func (h *Handler) GetSellerProducts(
 	req *proto.GetSellerProductsRequest,
 ) (*proto.ListProductsResponse, error) {
 
-	const userID uint = 1
+	userID, ok := middleware.UserID(ctx)
+	if !ok {
+		return nil, status.Error(
+			codes.Unauthenticated,
+			"user id missing",
+		)
+	}
+
 	products, err := h.service.GetSellerProducts(ctx, userID)
 	if err != nil {
 		return nil, toStatusError(err)
@@ -207,7 +235,13 @@ func (h *Handler) UpdateProductStock(
 	ctx context.Context,
 	req *proto.UpdateStockRequest,
 ) (*proto.Product, error) {
-	const userID uint32 = 1
+	userID, ok := middleware.UserID(ctx)
+	if !ok {
+		return nil, status.Error(
+			codes.Unauthenticated,
+			"user id missing",
+		)
+	}
 	input := dto.UpdateStockInput{
 		Stock: req.Stock,
 	}

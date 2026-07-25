@@ -4,13 +4,15 @@ import (
 	"log"
 	"net"
 
-	"github.com/Girmex/go-ecommerce/microservices/catalog/proto"
 	grpcadapter "github.com/Girmex/go-ecommerce/microservices/catalog/internal/adapters/grpc"
+	grpcmiddleware "github.com/Girmex/go-ecommerce/microservices/catalog/internal/adapters/grpc/middleware"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/adapters/persistence"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/adapters/persistence/models"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/application"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/config"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/database"
+	"github.com/Girmex/go-ecommerce/microservices/catalog/proto"
+	"github.com/Girmex/go-ecommerce/microservices/pkg/jwt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -35,9 +37,15 @@ func main() {
 
 	repository := persistence.NewCatalogRepository(db)
 
+	jwtManager := jwt.NewJWTManager(cfg.JWTSecret)
+
 	service := application.NewCatalogService(repository)
 
-	server := grpc.NewServer()
+	server := grpc.NewServer(
+		grpc.UnaryInterceptor(
+			grpcmiddleware.AuthInterceptor(jwtManager),
+		),
+	)
 	reflection.Register(server)
 	handler := grpcadapter.NewHandler(service)
 	proto.RegisterCatalogServiceServer(
