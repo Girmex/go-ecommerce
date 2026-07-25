@@ -20,4 +20,10 @@ type AuthRepository interface {
         ctx context.Context,
         email string,
     ) (*domain.User, error)
+    
+    UpdateRefreshToken(
+    ctx context.Context,
+    userID uint,
+    refreshToken string,
+) error
 }

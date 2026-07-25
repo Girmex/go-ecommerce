@@ -74,3 +74,12 @@ func (repo *AuthRepository) GetUserByEmail(ctx context.Context, email string) (*
 
 	return toUserDomain(&model), nil
 }
+func (r *AuthRepository) UpdateRefreshToken(ctx context.Context,userID uint,refreshToken string,
+) error {
+
+	return r.db.WithContext(ctx).
+		Model(&models.UserModel{}).
+		Where("id = ?", userID).
+		Update("refresh_token", refreshToken).
+		Error
+}

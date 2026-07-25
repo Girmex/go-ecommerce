@@ -11,6 +11,7 @@ func toUserModel(user *domain.User) *models.UserModel {
 		Name:      user.Name,
 		Email:     user.Email,
 		PasswordHash:  user.PasswordHash,
+		RefreshToken:  user.RefreshToken,
 	}
 }
 
@@ -20,5 +21,7 @@ func toUserDomain(model *models.UserModel) *domain.User {
 		Name:      model.Name,
 		Email:     model.Email,
 		PasswordHash:  model.PasswordHash,
+		RefreshToken:  model.RefreshToken,
+
 	}
 }

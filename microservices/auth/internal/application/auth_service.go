@@ -81,9 +81,21 @@ func (s *AuthService) Login(
 	if err != nil {
 		return nil, err
 	}
+
+	refreshToken, err := s.jwtManager.GenerateRefreshToken(user)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.repository.UpdateRefreshToken(
+		ctx,
+		user.ID,
+		refreshToken,
+	); err != nil {
+		return nil, err
+	}
 	return &dto.LoginOutput{
 		AccessToken:  accessToken,
-		RefreshToken: "dummy-refresh-token",
+		RefreshToken: refreshToken,
 		User:         user,
 	}, nil
 }

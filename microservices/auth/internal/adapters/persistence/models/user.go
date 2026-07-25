@@ -6,6 +6,7 @@ type UserModel struct {
     Name         string
     Email        string `gorm:"uniqueIndex"`
     PasswordHash string
+    RefreshToken string `gorm:"type:text"`
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }
