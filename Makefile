@@ -1,9 +1,8 @@
 .PHONY: \
 	proto-auth \
 	run-auth \
-	build \
+	run-catalog \
 	test
-
 
 proto-auth:
 	protoc \
@@ -17,16 +16,26 @@ proto-auth:
 run-auth:
 	APP_NAME="Auth Service" \
 	APP_ENV=development \
-	GRPC_PORT=50052 \
+	GRPC_PORT=50051 \
 	POSTGRES_HOST=localhost \
-	POSTGRES_PORT=5434 \
+	POSTGRES_PORT=5432 \
 	POSTGRES_USER=root \
 	POSTGRES_PASSWORD=root \
 	POSTGRES_DB=auth_db \
 	JWT_SECRET="super-secret-key" \
 	go run ./microservices/auth/cmd
-build:
-	go build ./microservices/auth/...
+
+run-catalog:
+	APP_NAME="Catalog Service" \
+	APP_ENV=development \
+	GRPC_PORT=50052 \
+	POSTGRES_HOST=localhost \
+	POSTGRES_PORT=5432 \
+	POSTGRES_USER=root \
+	POSTGRES_PASSWORD=root \
+	POSTGRES_DB=catalog_db \
+	JWT_SECRET="super-secret-key" \
+	go run ./microservices/catalog/cmd
 
 test:
 	go test ./microservices/auth/...

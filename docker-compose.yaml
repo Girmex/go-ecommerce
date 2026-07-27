@@ -22,43 +22,5 @@ services:
       timeout: 5s
       retries: 5
 
-  auth:
-    container_name: auth-service
-
-    build:
-      context: .
-      dockerfile: microservices/auth/Dockerfile
-
-    restart: unless-stopped
-
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-    env_file:
-      - .env.auth
-
-    ports:
-      - "50051:50051"
-
-  catalog:
-    container_name: catalog-service
-
-    build:
-      context: .
-      dockerfile: microservices/catalog/Dockerfile
-
-    restart: unless-stopped
-
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-    env_file:
-      - .env.catalog
-
-    ports:
-      - "50052:50052"
-
 volumes:
   postgres-data:

@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"context"
-
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/adapters/grpc/middleware"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/application"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/application/dto"
