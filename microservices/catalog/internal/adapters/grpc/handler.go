@@ -124,7 +124,7 @@ func (h *Handler) CreateProduct(
 	product, err := h.service.CreateProduct(
 		ctx,
 		input,
-		userID,
+		uint32(userID),
 	)
 	if err != nil {
 		return nil, toStatusError(err)
@@ -181,7 +181,7 @@ func (h *Handler) UpdateProduct(
 		Price:       req.Price,
 		Stock:       req.Stock,
 	}
-	product, err := h.service.UpdateProduct(ctx, uint(req.Id), input, userID)
+	product, err := h.service.UpdateProduct(ctx, uint(req.Id), input, uint32(userID))
 	if err != nil {
 		return nil, toStatusError(err)
 	}
@@ -201,7 +201,7 @@ func (h *Handler) DeleteProduct(
 		)
 	}
 
-	if err := h.service.DeleteProduct(ctx, uint(req.Id), userID); err != nil {
+	if err := h.service.DeleteProduct(ctx, uint(req.Id), uint32(userID)); err != nil {
 		return nil, toStatusError(err)
 	}
 	return &emptypb.Empty{}, nil
@@ -219,7 +219,7 @@ func (h *Handler) GetSellerProducts(
 		)
 	}
 
-	products, err := h.service.GetSellerProducts(ctx, userID)
+	products, err := h.service.GetSellerProducts(ctx, uint32(userID))
 	if err != nil {
 		return nil, toStatusError(err)
 	}
@@ -245,7 +245,7 @@ func (h *Handler) UpdateProductStock(
 	input := dto.UpdateStockInput{
 		Stock: req.Stock,
 	}
-	product, err := h.service.UpdateProductStock(ctx, uint(req.Id), input, userID)
+	product, err := h.service.UpdateProductStock(ctx, uint(req.Id), input, uint32(userID))
 	if err != nil {
 		return nil, toStatusError(err)
 	}

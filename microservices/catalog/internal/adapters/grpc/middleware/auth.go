@@ -67,7 +67,7 @@ func AuthInterceptor(
 			)
 		}
 
-		ctx = WithUserID(ctx, claims.UserID)
+		ctx = WithUserID(ctx, uint(claims.UserID))
 
 		return handler(ctx, req)
 	}

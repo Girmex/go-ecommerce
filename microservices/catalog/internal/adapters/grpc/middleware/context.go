@@ -10,7 +10,7 @@ func WithUserID(ctx context.Context, userID uint) context.Context {
 	return context.WithValue(ctx, userIDKey, userID)
 }
 
-func UserID(ctx context.Context) (uint32, bool) {
-	userID, ok := ctx.Value(userIDKey).(uint32)
+func UserID(ctx context.Context) (uint, bool) {
+	userID, ok := ctx.Value(userIDKey).(uint)
 	return userID, ok
 }

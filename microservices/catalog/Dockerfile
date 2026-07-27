@@ -1,5 +1,5 @@
 # ---------- Builder ----------
-FROM golang:1.24-alpine AS builder
+FROM golang:1.25-alpine AS builder
 
 WORKDIR /app
 
@@ -8,17 +8,16 @@ RUN go mod download
 
 COPY . .
 
-WORKDIR /app/microservices/catalog
-
-RUN CGO_ENABLED=0 GOOS=linux go build -o catalog-service ./cmd
+RUN CGO_ENABLED=0 GOOS=linux \
+    go build -o catalog-service ./microservices/catalog/cmd
 
 # ---------- Runtime ----------
 FROM alpine:3.22
 
 WORKDIR /app
 
-COPY --from=builder /app/microservices/catalog/catalog-service .
+COPY --from=builder /app/catalog-service .
 
-EXPOSE 50051
+EXPOSE 50052
 
 CMD ["./catalog-service"]

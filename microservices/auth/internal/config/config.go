@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"time"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -16,12 +17,15 @@ type Config struct {
 	PostgresUser     string
 	PostgresPassword string
 	PostgresDatabase string
-	JWTSecret       string
-	AccessTokenTTL  time.Duration
-	RefreshTokenTTL time.Duration
+	JWTSecret        string
+	AccessTokenTTL   time.Duration
+	RefreshTokenTTL  time.Duration
 }
 
 func Load() *Config {
+
+	_ = godotenv.Load(".env.auth")
+	
 	return &Config{
 		AppName: os.Getenv("APP_NAME"),
 		AppEnv:  os.Getenv("APP_ENV"),
@@ -34,7 +38,7 @@ func Load() *Config {
 		PostgresPassword: os.Getenv("POSTGRES_PASSWORD"),
 		PostgresDatabase: os.Getenv("POSTGRES_DB"),
 		JWTSecret:        os.Getenv("JWT_SECRET"),
-		AccessTokenTTL:  time.Hour * 24,        
-		RefreshTokenTTL: time.Hour * 24 * 30,  
+		AccessTokenTTL:   time.Hour * 24,
+		RefreshTokenTTL:  time.Hour * 24 * 30,
 	}
 }

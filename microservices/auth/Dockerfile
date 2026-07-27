@@ -1,4 +1,4 @@
-# Build stage
+# ---------- Builder ----------
 FROM golang:1.25-alpine AS builder
 
 WORKDIR /app
@@ -8,15 +8,16 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o auth-service ./microservices/auth/cmd
+RUN CGO_ENABLED=0 GOOS=linux \
+    go build -o auth-service ./microservices/auth/cmd
 
-# Runtime stage
-FROM alpine:latest
+# ---------- Runtime ----------
+FROM alpine:3.22
 
-WORKDIR /root/
+WORKDIR /app
 
 COPY --from=builder /app/auth-service .
 
-EXPOSE 50052
+EXPOSE 50051
 
 CMD ["./auth-service"]

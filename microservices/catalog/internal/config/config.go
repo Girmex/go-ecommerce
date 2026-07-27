@@ -1,6 +1,10 @@
 package config
 
-import "os"
+import (
+	"os"
+
+	"github.com/joho/godotenv"
+)
 
 type Config struct {
 	AppName          string
@@ -15,6 +19,8 @@ type Config struct {
 }
 
 func Load() *Config {
+	_ = godotenv.Load(".env.catalog")
+	
 	return &Config{
 		AppName:          os.Getenv("APP_NAME"),
 		AppEnv:           os.Getenv("APP_ENV"),
