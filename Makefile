@@ -11,7 +11,16 @@ proto-auth:
 		--go_opt=paths=source_relative \
 		--go-grpc_out=. \
 		--go-grpc_opt=paths=source_relative \
-		microservices/auth/api/proto/auth.proto
+		microservices/auth/proto/auth.proto
+
+proto-order:
+	protoc \
+		--proto_path=. \
+		--go_out=. \
+		--go_opt=paths=source_relative \
+		--go-grpc_out=. \
+		--go-grpc_opt=paths=source_relative \
+		microservices/order/proto/order.proto
 
 run-auth:
 	APP_NAME="Auth Service" \
