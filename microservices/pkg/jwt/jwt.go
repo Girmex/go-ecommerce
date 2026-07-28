@@ -15,7 +15,6 @@ type Claims struct {
 	UserID    uint
 	Email     string
 	TokenType string
-
 	jwtv5.RegisteredClaims
 }
 
