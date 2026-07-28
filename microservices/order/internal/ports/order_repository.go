@@ -9,14 +9,11 @@ import (
 type OrderRepository interface {
 	CreateOrder(ctx context.Context, order *domain.Order) error
 
-	GetOrderByID(ctx context.Context, id uint) (*domain.Order, error)
+	GetOrder(ctx context.Context, orderID uint) (*domain.Order, error)
 
-	GetOrdersByUser(
-		ctx context.Context,
-		userID uint,
-	) ([]domain.Order, error)
+	GetOrdersByUser(ctx context.Context, userID uint) ([]domain.Order, error)
 
 	UpdateOrder(ctx context.Context, order *domain.Order) error
 
-	DeleteOrder(ctx context.Context, id uint) error
+	DeleteOrder(ctx context.Context, orderID uint) error
 }

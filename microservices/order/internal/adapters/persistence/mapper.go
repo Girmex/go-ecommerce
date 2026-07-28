@@ -1,8 +1,8 @@
 package persistence
 
 import (
-	"github.com/Girmex/go-ecommerce/microservices/order/internal/domain"
 	"github.com/Girmex/go-ecommerce/microservices/order/internal/adapters/persistence/models"
+	"github.com/Girmex/go-ecommerce/microservices/order/internal/domain"
 )
 
 func toOrderModel(order *domain.Order) *models.OrderModel {
