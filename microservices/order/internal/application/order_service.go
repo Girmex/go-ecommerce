@@ -11,11 +11,14 @@ type OrderService struct {
 	repository ports.OrderRepository
 }
 
-func NewOrderService(orderRepository ports.OrderRepository) *OrderService {
+func NewOrderService(
+	orderRepository ports.OrderRepository,
+) *OrderService {
 	return &OrderService{
 		repository: orderRepository,
 	}
 }
+
 func (s *OrderService) CreateOrder(
 	ctx context.Context,
 	order *domain.Order,
@@ -26,13 +29,13 @@ func (s *OrderService) CreateOrder(
 
 func (s *OrderService) GetOrder(
 	ctx context.Context,
-	id uint,
+	orderID uint,
 ) (*domain.Order, error) {
 
-	return s.repository.GetOrder(ctx, id)
+	return s.repository.GetOrder(ctx, orderID)
 }
 
-func (s *OrderService) ListOrders(
+func (s *OrderService) GetOrdersByUser(
 	ctx context.Context,
 	userID uint,
 ) ([]domain.Order, error) {
@@ -42,10 +45,10 @@ func (s *OrderService) ListOrders(
 
 func (s *OrderService) CancelOrder(
 	ctx context.Context,
-	id uint,
+	orderID uint,
 ) error {
 
-	order, err := s.repository.GetOrder(ctx, id)
+	order, err := s.repository.GetOrder(ctx, orderID)
 	if err != nil {
 		return err
 	}
