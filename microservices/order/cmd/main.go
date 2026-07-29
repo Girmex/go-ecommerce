@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 
+	"github.com/Girmex/go-ecommerce/microservices/order/internal/adapters/cataloggrpc"
 	grpcadapter "github.com/Girmex/go-ecommerce/microservices/order/internal/adapters/grpc"
 	grpcmiddleware "github.com/Girmex/go-ecommerce/microservices/order/internal/adapters/grpc/middleware"
 	"github.com/Girmex/go-ecommerce/microservices/order/internal/adapters/persistence"
@@ -13,6 +14,7 @@ import (
 	"github.com/Girmex/go-ecommerce/microservices/order/proto"
 	"github.com/Girmex/go-ecommerce/microservices/pkg/jwt"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -29,12 +31,23 @@ func main() {
 	if err := database.AutoMigrate(pool); err != nil {
 		log.Fatal(err)
 	}
+	catalogConn, err := grpc.NewClient(
+		"localhost:50052",
+		grpc.WithTransportCredentials(
+			insecure.NewCredentials(),
+		),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer catalogConn.Close()
 
 	repository := persistence.NewOrderRepository(pool)
+	catalogClient := cataloggrpc.NewClient(catalogConn)
 
 	jwtManager := jwt.NewJWTManager(cfg.JWTSecret)
 
-	service := application.NewOrderService(repository)
+	service := application.NewOrderService(repository, catalogClient)
 
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(

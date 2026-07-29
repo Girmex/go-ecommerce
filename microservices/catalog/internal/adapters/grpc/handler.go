@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/adapters/grpc/middleware"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/application"
 	"github.com/Girmex/go-ecommerce/microservices/catalog/internal/application/dto"
@@ -143,18 +144,22 @@ func (h *Handler) GetProduct(
 	return toProtoProduct(product), nil
 }
 
-func (h *Handler) GetProducts(
-	ctx context.Context, req *emptypb.Empty,
+func (h *Handler) ListProducts(
+	ctx context.Context,
+	req *emptypb.Empty,
 ) (*proto.ListProductsResponse, error) {
 
 	products, err := h.service.GetProducts(ctx)
 	if err != nil {
 		return nil, toStatusError(err)
 	}
+
 	response := make([]*proto.Product, 0, len(products))
+
 	for _, product := range products {
 		response = append(response, toProtoProduct(product))
 	}
+
 	return &proto.ListProductsResponse{
 		Products: response,
 	}, nil
