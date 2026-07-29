@@ -3,18 +3,12 @@ package middleware
 import (
 	"context"
 	"strings"
-
 	"github.com/Girmex/go-ecommerce/microservices/pkg/jwt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
-
-var publicMethods = map[string]bool{
-	"/catalog.v1.CatalogService/GetProducts":    true,
-	"/catalog.v1.CatalogService/GetProductByID": true,
-}
 
 func AuthInterceptor(
 	jwtManager *jwt.JWTManager,
@@ -26,11 +20,6 @@ func AuthInterceptor(
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
 	) (interface{}, error) {
-
-		// Skip authentication for public endpoints
-		if publicMethods[info.FullMethod] {
-			return handler(ctx, req)
-		}
 
 		md, ok := metadata.FromIncomingContext(ctx)
 		if !ok {

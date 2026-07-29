@@ -3,9 +3,9 @@ package payment
 import (
 	"errors"
 	"fmt"
+	"log"
 	"github.com/stripe/stripe-go/v78"
 	"github.com/stripe/stripe-go/v78/paymentintent"
-	"log"
 )
 
 type PaymentClient interface {
@@ -15,6 +15,12 @@ type PaymentClient interface {
 
 type payment struct {
 	stripeSecretKey string
+}
+
+func NewPaymentClient(stripeSecretKey string) PaymentClient {
+	return &payment{
+		stripeSecretKey: stripeSecretKey,
+	}
 }
 
 func (p payment) CreatePayment(amount float64, userId uint, orderId string) (*stripe.PaymentIntent, error) {
@@ -51,10 +57,4 @@ func (p payment) GetPaymentStatus(pId string) (*stripe.PaymentIntent, error) {
 		return nil, errors.New("get payment intent failed")
 	}
 	return result, nil
-}
-
-func NewPaymentClient(stripeSecretKey string) PaymentClient {
-	return &payment{
-		stripeSecretKey: stripeSecretKey,
-	}
 }

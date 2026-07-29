@@ -46,5 +46,16 @@ run-catalog:
 	JWT_SECRET="super-secret-key" \
 	go run ./microservices/catalog/cmd
 
+run-order:
+	APP_NAME="Order Service" \
+	APP_ENV=development \
+	GRPC_PORT=50053 \
+	POSTGRES_HOST=localhost \
+	POSTGRES_PORT=5432 \
+	POSTGRES_USER=root \
+	POSTGRES_PASSWORD=root \
+	POSTGRES_DB=order_db \
+	JWT_SECRET="super-secret-key" \
+	go run ./microservices/order/cmd
 test:
 	go test ./microservices/auth/...
