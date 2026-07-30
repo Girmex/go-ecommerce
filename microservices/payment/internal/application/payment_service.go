@@ -1,0 +1,90 @@
+package application
+
+import (
+	"context"
+
+	"github.com/Girmex/go-ecommerce/microservices/payment/internal/domain"
+	"github.com/Girmex/go-ecommerce/microservices/payment/internal/ports"
+)
+
+type PaymentService struct {
+	repository ports.PaymentRepository
+}
+
+func NewPaymentService(
+	repository ports.PaymentRepository,
+) *PaymentService {
+	return &PaymentService{
+		repository: repository,
+	}
+}
+
+func (s *PaymentService) CreatePayment(
+	ctx context.Context,
+	orderID uint,
+	userID uint,
+	amount float64,
+) (*domain.Payment, error) {
+
+	payment := &domain.Payment{
+		OrderID: orderID,
+		UserID:  userID,
+		Amount:  amount,
+		Status:  domain.PaymentPending,
+	}
+
+	err := s.repository.CreatePayment(ctx, payment)
+	if err != nil {
+		return nil, err
+	}
+
+	return payment, nil
+}
+
+func (s *PaymentService) GetPayment(
+	ctx context.Context,
+	id uint,
+) (*domain.Payment, error) {
+
+	return s.repository.GetPayment(ctx, id)
+}
+
+func (s *PaymentService) CompletePayment(
+	ctx context.Context,
+	id uint,
+) (*domain.Payment, error) {
+
+	payment, err := s.repository.GetPayment(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	payment.Status = domain.PaymentSuccess
+
+	err = s.repository.UpdatePayment(ctx, payment)
+	if err != nil {
+		return nil, err
+	}
+
+	return payment, nil
+}
+
+func (s *PaymentService) FailPayment(
+	ctx context.Context,
+	id uint,
+) (*domain.Payment, error) {
+
+	payment, err := s.repository.GetPayment(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	payment.Status = domain.PaymentFailed
+
+	err = s.repository.UpdatePayment(ctx, payment)
+	if err != nil {
+		return nil, err
+	}
+
+	return payment, nil
+}
