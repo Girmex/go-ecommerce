@@ -39,3 +39,51 @@ func (h *Handler) CreatePayment(
 
 	return toProtoPayment(payment), nil
 }
+
+func (h *Handler) GetPayment(
+	ctx context.Context,
+	req *proto.GetPaymentRequest,
+) (*proto.Payment, error) {
+
+	payment, err := h.service.GetPayment(
+		ctx,
+		uint(req.Id),
+	)
+	if err != nil {
+		return nil, toStatusError(err)
+	}
+
+	return toProtoPayment(payment), nil
+}
+
+func (h *Handler) CompletePayment(
+	ctx context.Context,
+	req *proto.CompletePaymentRequest,
+) (*proto.Payment, error) {
+
+	payment, err := h.service.CompletePayment(
+		ctx,
+		uint(req.Id),
+	)
+	if err != nil {
+		return nil, toStatusError(err)
+	}
+
+	return toProtoPayment(payment), nil
+}
+
+func (h *Handler) FailPayment(
+	ctx context.Context,
+	req *proto.FailPaymentRequest,
+) (*proto.Payment, error) {
+
+	payment, err := h.service.FailPayment(
+		ctx,
+		uint(req.Id),
+	)
+	if err != nil {
+		return nil, toStatusError(err)
+	}
+
+	return toProtoPayment(payment), nil
+}

@@ -59,10 +59,17 @@ func (s *PaymentService) CompletePayment(
 		return nil, err
 	}
 
+	if payment.Status == domain.PaymentSuccess {
+		return nil, domain.ErrPaymentAlreadyCompleted
+	}
+
+	if payment.Status == domain.PaymentFailed {
+		return nil, domain.ErrPaymentAlreadyFailed
+	}
+
 	payment.Status = domain.PaymentSuccess
 
-	err = s.repository.UpdatePayment(ctx, payment)
-	if err != nil {
+	if err := s.repository.UpdatePayment(ctx, payment); err != nil {
 		return nil, err
 	}
 
@@ -79,10 +86,17 @@ func (s *PaymentService) FailPayment(
 		return nil, err
 	}
 
+	if payment.Status == domain.PaymentSuccess {
+		return nil, domain.ErrPaymentAlreadyCompleted
+	}
+
+	if payment.Status == domain.PaymentFailed {
+		return nil, domain.ErrPaymentAlreadyFailed
+	}
+
 	payment.Status = domain.PaymentFailed
 
-	err = s.repository.UpdatePayment(ctx, payment)
-	if err != nil {
+	if err := s.repository.UpdatePayment(ctx, payment); err != nil {
 		return nil, err
 	}
 

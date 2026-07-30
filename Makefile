@@ -1,7 +1,12 @@
 .PHONY: \
 	proto-auth \
+	proto-catalog \
+	proto-order \
+	proto-payment \
 	run-auth \
 	run-catalog \
+	run-order \
+	run-payment \
 	test
 
 proto-auth:
@@ -74,5 +79,17 @@ run-order:
 	POSTGRES_DB=order_db \
 	JWT_SECRET="super-secret-key" \
 	go run ./microservices/order/cmd
+
+run-payment:
+	APP_NAME="Payment Service" \
+	APP_ENV=development \
+	GRPC_PORT=50054 \
+	POSTGRES_HOST=localhost \
+	POSTGRES_PORT=5432 \
+	POSTGRES_USER=root \
+	POSTGRES_PASSWORD=root \
+	POSTGRES_DB=payment_db \
+	JWT_SECRET="super-secret-key" \
+	go run ./microservices/payment/cmd
 test:
-	go test ./microservices/auth/...
+	go test ./...
