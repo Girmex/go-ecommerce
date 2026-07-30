@@ -255,3 +255,19 @@ func (h *Handler) UpdateProductStock(
 	}
 	return toProtoProduct(product), nil
 }
+func (h *Handler) DecreaseProductStock(
+	ctx context.Context,
+	req *proto.DecreaseProductStockRequest,
+) (*proto.Product, error) {
+
+	product, err := h.service.DecreaseProductStock(
+		ctx,
+		uint(req.Id),
+		req.Quantity,
+	)
+	if err != nil {
+		return nil, toStatusError(err)
+	}
+
+	return toProtoProduct(product), nil
+}

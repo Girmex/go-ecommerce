@@ -12,6 +12,7 @@ import (
 type OrderService struct {
 	repository ports.OrderRepository
 	catalog    ports.CatalogClient
+	
 }
 
 func NewOrderService(
@@ -45,8 +46,18 @@ func (s *OrderService) CreateOrder(
 		}
 
 		// Validate stock
-		if (product.Stock) < item.Quantity {
+		if product.Stock < item.Quantity {
 			return nil, domain.ErrInsufficientStock
+		}
+
+		// Decrease stock in Catalog Service
+		_, err = s.catalog.DecreaseProductStock(
+			ctx,
+			uint(product.Id),
+			item.Quantity,
+		)
+		if err != nil {
+			return nil, err
 		}
 
 		orderItem := domain.OrderItem{

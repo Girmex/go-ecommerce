@@ -83,6 +83,13 @@ message ListProductsResponse {
   repeated Product products = 1;
 }
 
+
+message DecreaseProductStockRequest {
+  uint32 id = 1;
+  uint32 quantity = 2;
+}
+
+
 // services
 
 service CatalogService {
@@ -124,4 +131,6 @@ service CatalogService {
 
   rpc UpdateProductStock(UpdateStockRequest)
       returns (Product);
+  rpc DecreaseProductStock(DecreaseProductStockRequest)
+    returns (Product);
 }

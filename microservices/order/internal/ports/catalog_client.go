@@ -11,4 +11,9 @@ type CatalogClient interface {
 		ctx context.Context,
 		productID uint,
 	) (*proto.Product, error)
+	DecreaseProductStock(
+		ctx context.Context,
+		productID uint,
+		quantity uint32,
+	) (*proto.Product, error)
 }

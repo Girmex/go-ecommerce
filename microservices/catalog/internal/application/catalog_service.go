@@ -232,3 +232,22 @@ func (s *CatalogService) UpdateProductStock(
 
 	return s.repository.UpdateProduct(ctx, product)
 }
+func (s *CatalogService) DecreaseProductStock(
+	ctx context.Context,
+	id uint,
+	quantity uint32,
+) (*domain.Product, error) {
+
+	product, err := s.repository.FindProductByID(ctx, id)
+	if err != nil {
+		return nil, domain.ErrProductNotFound
+	}
+
+	if product.Stock < quantity {
+		return nil, domain.ErrInsufficientStock
+	}
+
+	product.Stock -= quantity
+
+	return s.repository.UpdateProduct(ctx, product)
+}

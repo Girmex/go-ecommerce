@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             v3.21.12
-// source: microservices/catalog/api/proto/catalog.proto
+// source: microservices/catalog/proto/catalog.proto
 
 package proto
 
@@ -20,18 +20,19 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CatalogService_CreateCategory_FullMethodName     = "/catalog.v1.CatalogService/CreateCategory"
-	CatalogService_UpdateCategory_FullMethodName     = "/catalog.v1.CatalogService/UpdateCategory"
-	CatalogService_DeleteCategory_FullMethodName     = "/catalog.v1.CatalogService/DeleteCategory"
-	CatalogService_GetCategory_FullMethodName        = "/catalog.v1.CatalogService/GetCategory"
-	CatalogService_ListCategories_FullMethodName     = "/catalog.v1.CatalogService/ListCategories"
-	CatalogService_CreateProduct_FullMethodName      = "/catalog.v1.CatalogService/CreateProduct"
-	CatalogService_UpdateProduct_FullMethodName      = "/catalog.v1.CatalogService/UpdateProduct"
-	CatalogService_DeleteProduct_FullMethodName      = "/catalog.v1.CatalogService/DeleteProduct"
-	CatalogService_GetProduct_FullMethodName         = "/catalog.v1.CatalogService/GetProduct"
-	CatalogService_ListProducts_FullMethodName       = "/catalog.v1.CatalogService/ListProducts"
-	CatalogService_GetSellerProducts_FullMethodName  = "/catalog.v1.CatalogService/GetSellerProducts"
-	CatalogService_UpdateProductStock_FullMethodName = "/catalog.v1.CatalogService/UpdateProductStock"
+	CatalogService_CreateCategory_FullMethodName       = "/catalog.v1.CatalogService/CreateCategory"
+	CatalogService_UpdateCategory_FullMethodName       = "/catalog.v1.CatalogService/UpdateCategory"
+	CatalogService_DeleteCategory_FullMethodName       = "/catalog.v1.CatalogService/DeleteCategory"
+	CatalogService_GetCategory_FullMethodName          = "/catalog.v1.CatalogService/GetCategory"
+	CatalogService_ListCategories_FullMethodName       = "/catalog.v1.CatalogService/ListCategories"
+	CatalogService_CreateProduct_FullMethodName        = "/catalog.v1.CatalogService/CreateProduct"
+	CatalogService_UpdateProduct_FullMethodName        = "/catalog.v1.CatalogService/UpdateProduct"
+	CatalogService_DeleteProduct_FullMethodName        = "/catalog.v1.CatalogService/DeleteProduct"
+	CatalogService_GetProduct_FullMethodName           = "/catalog.v1.CatalogService/GetProduct"
+	CatalogService_ListProducts_FullMethodName         = "/catalog.v1.CatalogService/ListProducts"
+	CatalogService_GetSellerProducts_FullMethodName    = "/catalog.v1.CatalogService/GetSellerProducts"
+	CatalogService_UpdateProductStock_FullMethodName   = "/catalog.v1.CatalogService/UpdateProductStock"
+	CatalogService_DecreaseProductStock_FullMethodName = "/catalog.v1.CatalogService/DecreaseProductStock"
 )
 
 // CatalogServiceClient is the client API for CatalogService service.
@@ -52,6 +53,7 @@ type CatalogServiceClient interface {
 	ListProducts(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListProductsResponse, error)
 	GetSellerProducts(ctx context.Context, in *GetSellerProductsRequest, opts ...grpc.CallOption) (*ListProductsResponse, error)
 	UpdateProductStock(ctx context.Context, in *UpdateStockRequest, opts ...grpc.CallOption) (*Product, error)
+	DecreaseProductStock(ctx context.Context, in *DecreaseProductStockRequest, opts ...grpc.CallOption) (*Product, error)
 }
 
 type catalogServiceClient struct {
@@ -182,6 +184,16 @@ func (c *catalogServiceClient) UpdateProductStock(ctx context.Context, in *Updat
 	return out, nil
 }
 
+func (c *catalogServiceClient) DecreaseProductStock(ctx context.Context, in *DecreaseProductStockRequest, opts ...grpc.CallOption) (*Product, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Product)
+	err := c.cc.Invoke(ctx, CatalogService_DecreaseProductStock_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CatalogServiceServer is the server API for CatalogService service.
 // All implementations must embed UnimplementedCatalogServiceServer
 // for forward compatibility.
@@ -200,6 +212,7 @@ type CatalogServiceServer interface {
 	ListProducts(context.Context, *emptypb.Empty) (*ListProductsResponse, error)
 	GetSellerProducts(context.Context, *GetSellerProductsRequest) (*ListProductsResponse, error)
 	UpdateProductStock(context.Context, *UpdateStockRequest) (*Product, error)
+	DecreaseProductStock(context.Context, *DecreaseProductStockRequest) (*Product, error)
 	mustEmbedUnimplementedCatalogServiceServer()
 }
 
@@ -245,6 +258,9 @@ func (UnimplementedCatalogServiceServer) GetSellerProducts(context.Context, *Get
 }
 func (UnimplementedCatalogServiceServer) UpdateProductStock(context.Context, *UpdateStockRequest) (*Product, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateProductStock not implemented")
+}
+func (UnimplementedCatalogServiceServer) DecreaseProductStock(context.Context, *DecreaseProductStockRequest) (*Product, error) {
+	return nil, status.Error(codes.Unimplemented, "method DecreaseProductStock not implemented")
 }
 func (UnimplementedCatalogServiceServer) mustEmbedUnimplementedCatalogServiceServer() {}
 func (UnimplementedCatalogServiceServer) testEmbeddedByValue()                        {}
@@ -483,6 +499,24 @@ func _CatalogService_UpdateProductStock_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CatalogService_DecreaseProductStock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DecreaseProductStockRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CatalogServiceServer).DecreaseProductStock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CatalogService_DecreaseProductStock_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CatalogServiceServer).DecreaseProductStock(ctx, req.(*DecreaseProductStockRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CatalogService_ServiceDesc is the grpc.ServiceDesc for CatalogService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -538,7 +572,11 @@ var CatalogService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "UpdateProductStock",
 			Handler:    _CatalogService_UpdateProductStock_Handler,
 		},
+		{
+			MethodName: "DecreaseProductStock",
+			Handler:    _CatalogService_DecreaseProductStock_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "microservices/catalog/api/proto/catalog.proto",
+	Metadata: "microservices/catalog/proto/catalog.proto",
 }

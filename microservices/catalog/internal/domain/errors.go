@@ -10,4 +10,5 @@ var (
 	ErrCategoryAlreadyExists = errors.New("category already exists")
 	ErrProductAlreadyExists  = errors.New("product already exists")
 	ErrProductOutOfStock     = errors.New("product out of stock")
+	ErrInsufficientStock     = errors.New("insufficient stock")
 )

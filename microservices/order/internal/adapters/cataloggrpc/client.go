@@ -45,3 +45,32 @@ func (c *Client) GetProduct(
 		},
 	)
 }
+
+func (c *Client) DecreaseProductStock(
+	ctx context.Context,
+	productID uint,
+	quantity uint32,
+) (*catalogproto.Product, error) {
+
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+
+		authHeaders := md.Get("authorization")
+
+		if len(authHeaders) > 0 {
+
+			ctx = metadata.AppendToOutgoingContext(
+				ctx,
+				"authorization",
+				authHeaders[0],
+			)
+		}
+	}
+
+	return c.client.DecreaseProductStock(
+		ctx,
+		&catalogproto.DecreaseProductStockRequest{
+			Id:       uint32(productID),
+			Quantity: quantity,
+		},
+	)
+}

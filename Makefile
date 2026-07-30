@@ -12,6 +12,14 @@ proto-auth:
 		--go-grpc_out=. \
 		--go-grpc_opt=paths=source_relative \
 		microservices/auth/proto/auth.proto
+proto-catalog:
+	protoc \
+		--proto_path=. \
+		--go_out=. \
+		--go_opt=paths=source_relative \
+		--go-grpc_out=. \
+		--go-grpc_opt=paths=source_relative \
+		microservices/catalog/proto/catalog.proto
 
 proto-order:
 	protoc \
