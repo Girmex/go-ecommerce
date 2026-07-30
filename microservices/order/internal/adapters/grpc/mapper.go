@@ -52,19 +52,3 @@ func toProtoOrder(order *domain.Order) *proto.Order {
 		TotalPrice: order.TotalPrice,
 	}
 }
-
-func toDomainOrderItems(
-	items []*proto.OrderItemRequest,
-) []domain.OrderItem {
-
-	result := make([]domain.OrderItem, len(items))
-
-	for i, item := range items {
-		result[i] = domain.OrderItem{
-			ProductID: uint(item.ProductId),
-			Quantity:  uint(item.Quantity),
-		}
-	}
-
-	return result
-}

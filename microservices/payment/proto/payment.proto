@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package payment.v1;
+
+option go_package = "github.com/Girmex/go-ecommerce/microservices/payment/api/proto;proto";
+
+message Payment {
+  uint32 id = 1;
+  uint32 order_id = 2;
+  uint32 user_id = 3;
+  double amount = 4;
+  PaymentStatus status = 5;
+}
+
+enum PaymentStatus {
+  PAYMENT_STATUS_UNSPECIFIED = 0;
+  PAYMENT_STATUS_PENDING = 1;
+  PAYMENT_STATUS_SUCCESS = 2;
+  PAYMENT_STATUS_FAILED = 3;
+}
+
+message CreatePaymentRequest {
+  uint32 order_id = 1;
+  uint32 user_id = 2;
+  double amount = 3;
+}
+
+message GetPaymentRequest {
+  uint32 id = 1;
+}
+
+message CompletePaymentRequest {
+  uint32 id = 1;
+}
+
+message FailPaymentRequest {
+  uint32 id = 1;
+}
+
+// services
+
+service PaymentService {
+
+  rpc CreatePayment(CreatePaymentRequest)
+      returns (Payment);
+
+  rpc GetPayment(GetPaymentRequest)
+      returns (Payment);
+
+  rpc CompletePayment(CompletePaymentRequest)
+      returns (Payment);
+
+  rpc FailPayment(FailPaymentRequest)
+      returns (Payment);
+}

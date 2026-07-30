@@ -30,6 +30,15 @@ proto-order:
 		--go-grpc_opt=paths=source_relative \
 		microservices/order/proto/order.proto
 
+proto-payment:
+	protoc \
+		--proto_path=. \
+		--go_out=. \
+		--go_opt=paths=source_relative \
+		--go-grpc_out=. \
+		--go-grpc_opt=paths=source_relative \
+		microservices/payment/proto/payment.proto	
+
 run-auth:
 	APP_NAME="Auth Service" \
 	APP_ENV=development \
