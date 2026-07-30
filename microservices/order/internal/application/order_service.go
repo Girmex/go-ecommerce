@@ -44,6 +44,11 @@ func (s *OrderService) CreateOrder(
 			return nil, err
 		}
 
+		// Validate stock
+		if (product.Stock) < item.Quantity {
+			return nil, domain.ErrInsufficientStock
+		}
+
 		orderItem := domain.OrderItem{
 			ProductID: uint(product.Id),
 			Quantity:  uint(item.Quantity),

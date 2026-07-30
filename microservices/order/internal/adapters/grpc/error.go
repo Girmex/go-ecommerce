@@ -23,6 +23,11 @@ func toStatusError(err error) error {
 			codes.PermissionDenied,
 			err.Error(),
 		)
+	case errors.Is(err, domain.ErrInsufficientStock):
+		return status.Error(
+			codes.FailedPrecondition,
+			err.Error(),
+		)
 
 	default:
 		return status.Error(
