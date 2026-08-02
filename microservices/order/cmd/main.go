@@ -32,7 +32,7 @@ func main() {
 		log.Fatal(err)
 	}
 	catalogConn, err := grpc.NewClient(
-		"localhost:50053",
+		"localhost:50052",
 		grpc.WithTransportCredentials(
 			insecure.NewCredentials(),
 		),

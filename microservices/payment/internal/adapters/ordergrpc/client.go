@@ -18,18 +18,16 @@ func NewClient(conn *grpc.ClientConn) *Client {
 	}
 }
 
-func (c *Client) UpdateOrderStatus(
+func (c *Client) MarkOrderAsPaid(
 	ctx context.Context,
 	orderID uint,
-	status orderproto.OrderStatus,
-) (*orderproto.Order, error) {
+) error {
 
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
 
 		authHeaders := md.Get("authorization")
 
 		if len(authHeaders) > 0 {
-
 			ctx = metadata.AppendToOutgoingContext(
 				ctx,
 				"authorization",
@@ -38,11 +36,42 @@ func (c *Client) UpdateOrderStatus(
 		}
 	}
 
-	return c.client.UpdateOrderStatus(
+	_, err := c.client.UpdateOrderStatus(
 		ctx,
 		&orderproto.UpdateOrderStatusRequest{
-			Id:     uint32(orderID),
-			Status: status,
+			Id: uint32(orderID),
+			Status: orderproto.OrderStatus_ORDER_STATUS_PAID,
 		},
 	)
+
+	return err
+}
+
+func (c *Client) CancelOrder(
+	ctx context.Context,
+	orderID uint,
+) error {
+
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+
+		authHeaders := md.Get("authorization")
+
+		if len(authHeaders) > 0 {
+			ctx = metadata.AppendToOutgoingContext(
+				ctx,
+				"authorization",
+				authHeaders[0],
+			)
+		}
+	}
+
+	_, err := c.client.UpdateOrderStatus(
+		ctx,
+		&orderproto.UpdateOrderStatusRequest{
+			Id: uint32(orderID),
+			Status: orderproto.OrderStatus_ORDER_STATUS_CANCELLED,
+		},
+	)
+
+	return err
 }

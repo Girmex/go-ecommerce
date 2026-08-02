@@ -11,7 +11,7 @@ import (
 
 type OrderService struct {
 	repository ports.OrderRepository
-	catalog    ports.CatalogClient
+	catalogClient ports.CatalogClient
 }
 
 func NewOrderService(
@@ -20,7 +20,7 @@ func NewOrderService(
 ) *OrderService {
 	return &OrderService{
 		repository: orderRepository,
-		catalog:    catalogClient,
+		catalogClient: catalogClient,
 	}
 }
 
@@ -36,7 +36,7 @@ func (s *OrderService) CreateOrder(
 
 	for _, item := range input.Items {
 
-		product, err := s.catalog.GetProduct(
+		product, err := s.catalogClient.GetProduct(
 			ctx,
 			uint(item.ProductID),
 		)
@@ -50,7 +50,7 @@ func (s *OrderService) CreateOrder(
 		}
 
 		// Decrease stock in Catalog Service
-		_, err = s.catalog.DecreaseProductStock(
+		_, err = s.catalogClient.DecreaseProductStock(
 			ctx,
 			uint(product.Id),
 			item.Quantity,
@@ -138,9 +138,45 @@ func (s *OrderService) UpdateOrderStatus(
 	status domain.OrderStatus,
 ) (*domain.Order, error) {
 
-	return s.repository.UpdateOrderStatus(
-		ctx,
-		id,
-		status,
-	)
+	order, err := s.repository.GetOrder(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	switch status {
+
+	case domain.OrderPaid:
+
+		if err := order.MarkAsPaid(); err != nil {
+			return nil, err
+		}
+
+		for _, item := range order.Items {
+
+			_, err := s.catalogClient.DecreaseProductStock(
+				ctx,
+				item.ProductID,
+				uint32(item.Quantity),
+			)
+
+			if err != nil {
+				return nil, err
+			}
+		}
+
+	case domain.OrderCancelled:
+
+		if err := order.Cancel(); err != nil {
+			return nil, err
+		}
+
+	default:
+		return nil, domain.ErrInvalidOrderStatus
+	}
+
+	if err := s.repository.UpdateOrder(ctx, order); err != nil {
+		return nil, err
+	}
+
+	return order, nil
 }

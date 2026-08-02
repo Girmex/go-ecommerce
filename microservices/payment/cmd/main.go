@@ -34,7 +34,7 @@ func main() {
 		log.Fatal(err)
 	}
 	orderConn, err := grpc.NewClient(
-		"localhost:50051",
+		"localhost:50053",
 		grpc.WithTransportCredentials(
 			insecure.NewCredentials(),
 		),

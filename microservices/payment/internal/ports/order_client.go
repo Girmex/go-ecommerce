@@ -1,15 +1,15 @@
 package ports
 
-import (
-	"context"
-
-	"github.com/Girmex/go-ecommerce/microservices/order/proto"
-)
+import "context"
 
 type OrderClient interface {
-	UpdateOrderStatus(
+	MarkOrderAsPaid(
 		ctx context.Context,
 		orderID uint,
-		status proto.OrderStatus,
-	) (*proto.Order, error)
+	) error
+
+	CancelOrder(
+		ctx context.Context,
+		orderID uint,
+	) error
 }
