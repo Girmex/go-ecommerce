@@ -260,3 +260,29 @@ func (r *Repository) DeleteOrder(
 
 	return tx.Commit(ctx)
 }
+
+func (r *Repository) UpdateOrderStatus(
+	ctx context.Context,
+	id uint,
+	status domain.OrderStatus,
+) (*domain.Order, error) {
+
+	_, err := r.db.Exec(
+		ctx,
+		`
+		UPDATE orders
+		SET
+			status = $1,
+			updated_at = NOW()
+		WHERE id = $2
+		`,
+		string(status),
+		id,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return r.GetOrder(ctx, id)
+}

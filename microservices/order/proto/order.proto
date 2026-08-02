@@ -47,7 +47,10 @@ message GetOrderRequest {
 message ListOrdersResponse {
   repeated Order orders = 1;
 }
-
+message UpdateOrderStatusRequest {
+  uint32 id = 1;
+  OrderStatus status = 2;
+}
 service OrderService {
 
   rpc CreateOrder(CreateOrderRequest)
@@ -61,4 +64,6 @@ service OrderService {
 
   rpc CancelOrder(GetOrderRequest)
       returns (google.protobuf.Empty);
+  rpc UpdateOrderStatus(UpdateOrderStatusRequest)
+    returns (Order);
 }

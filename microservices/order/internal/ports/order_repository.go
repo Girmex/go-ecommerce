@@ -16,4 +16,5 @@ type OrderRepository interface {
 	UpdateOrder(ctx context.Context, order *domain.Order) error
 
 	DeleteOrder(ctx context.Context, orderID uint) error
+	UpdateOrderStatus(ctx context.Context, id uint, status domain.OrderStatus) (*domain.Order, error)
 }

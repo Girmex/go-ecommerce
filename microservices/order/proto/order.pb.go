@@ -411,6 +411,58 @@ func (x *ListOrdersResponse) GetOrders() []*Order {
 	return nil
 }
 
+type UpdateOrderStatusRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Status        OrderStatus            `protobuf:"varint,2,opt,name=status,proto3,enum=order.v1.OrderStatus" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateOrderStatusRequest) Reset() {
+	*x = UpdateOrderStatusRequest{}
+	mi := &file_microservices_order_proto_order_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateOrderStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateOrderStatusRequest) ProtoMessage() {}
+
+func (x *UpdateOrderStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_microservices_order_proto_order_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateOrderStatusRequest.ProtoReflect.Descriptor instead.
+func (*UpdateOrderStatusRequest) Descriptor() ([]byte, []int) {
+	return file_microservices_order_proto_order_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *UpdateOrderStatusRequest) GetId() uint32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *UpdateOrderStatusRequest) GetStatus() OrderStatus {
+	if x != nil {
+		return x.Status
+	}
+	return OrderStatus_ORDER_STATUS_UNSPECIFIED
+}
+
 var File_microservices_order_proto_order_proto protoreflect.FileDescriptor
 
 const file_microservices_order_proto_order_proto_rawDesc = "" +
@@ -439,7 +491,10 @@ const file_microservices_order_proto_order_proto_rawDesc = "" +
 	"\x0fGetOrderRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\"=\n" +
 	"\x12ListOrdersResponse\x12'\n" +
-	"\x06orders\x18\x01 \x03(\v2\x0f.order.v1.OrderR\x06orders*\xd1\x01\n" +
+	"\x06orders\x18\x01 \x03(\v2\x0f.order.v1.OrderR\x06orders\"Y\n" +
+	"\x18UpdateOrderStatusRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\x12-\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x15.order.v1.OrderStatusR\x06status*\xd1\x01\n" +
 	"\vOrderStatus\x12\x1c\n" +
 	"\x18ORDER_STATUS_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14ORDER_STATUS_PENDING\x10\x01\x12!\n" +
@@ -447,13 +502,14 @@ const file_microservices_order_proto_order_proto_rawDesc = "" +
 	"\x11ORDER_STATUS_PAID\x10\x03\x12\x1a\n" +
 	"\x16ORDER_STATUS_CANCELLED\x10\x04\x12\x18\n" +
 	"\x14ORDER_STATUS_SHIPPED\x10\x05\x12\x1a\n" +
-	"\x16ORDER_STATUS_DELIVERED\x10\x062\x8a\x02\n" +
+	"\x16ORDER_STATUS_DELIVERED\x10\x062\xd4\x02\n" +
 	"\fOrderService\x12<\n" +
 	"\vCreateOrder\x12\x1c.order.v1.CreateOrderRequest\x1a\x0f.order.v1.Order\x126\n" +
 	"\bGetOrder\x12\x19.order.v1.GetOrderRequest\x1a\x0f.order.v1.Order\x12B\n" +
 	"\n" +
 	"ListOrders\x12\x16.google.protobuf.Empty\x1a\x1c.order.v1.ListOrdersResponse\x12@\n" +
-	"\vCancelOrder\x12\x19.order.v1.GetOrderRequest\x1a\x16.google.protobuf.EmptyBDZBgithub.com/Girmex/go-ecommerce/microservices/order/api/proto;protob\x06proto3"
+	"\vCancelOrder\x12\x19.order.v1.GetOrderRequest\x1a\x16.google.protobuf.Empty\x12H\n" +
+	"\x11UpdateOrderStatus\x12\".order.v1.UpdateOrderStatusRequest\x1a\x0f.order.v1.OrderBDZBgithub.com/Girmex/go-ecommerce/microservices/order/api/proto;protob\x06proto3"
 
 var (
 	file_microservices_order_proto_order_proto_rawDescOnce sync.Once
@@ -468,35 +524,39 @@ func file_microservices_order_proto_order_proto_rawDescGZIP() []byte {
 }
 
 var file_microservices_order_proto_order_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_microservices_order_proto_order_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_microservices_order_proto_order_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_microservices_order_proto_order_proto_goTypes = []any{
-	(OrderStatus)(0),           // 0: order.v1.OrderStatus
-	(*OrderItem)(nil),          // 1: order.v1.OrderItem
-	(*Order)(nil),              // 2: order.v1.Order
-	(*OrderItemRequest)(nil),   // 3: order.v1.OrderItemRequest
-	(*CreateOrderRequest)(nil), // 4: order.v1.CreateOrderRequest
-	(*GetOrderRequest)(nil),    // 5: order.v1.GetOrderRequest
-	(*ListOrdersResponse)(nil), // 6: order.v1.ListOrdersResponse
-	(*emptypb.Empty)(nil),      // 7: google.protobuf.Empty
+	(OrderStatus)(0),                 // 0: order.v1.OrderStatus
+	(*OrderItem)(nil),                // 1: order.v1.OrderItem
+	(*Order)(nil),                    // 2: order.v1.Order
+	(*OrderItemRequest)(nil),         // 3: order.v1.OrderItemRequest
+	(*CreateOrderRequest)(nil),       // 4: order.v1.CreateOrderRequest
+	(*GetOrderRequest)(nil),          // 5: order.v1.GetOrderRequest
+	(*ListOrdersResponse)(nil),       // 6: order.v1.ListOrdersResponse
+	(*UpdateOrderStatusRequest)(nil), // 7: order.v1.UpdateOrderStatusRequest
+	(*emptypb.Empty)(nil),            // 8: google.protobuf.Empty
 }
 var file_microservices_order_proto_order_proto_depIdxs = []int32{
-	0, // 0: order.v1.Order.status:type_name -> order.v1.OrderStatus
-	1, // 1: order.v1.Order.items:type_name -> order.v1.OrderItem
-	3, // 2: order.v1.CreateOrderRequest.items:type_name -> order.v1.OrderItemRequest
-	2, // 3: order.v1.ListOrdersResponse.orders:type_name -> order.v1.Order
-	4, // 4: order.v1.OrderService.CreateOrder:input_type -> order.v1.CreateOrderRequest
-	5, // 5: order.v1.OrderService.GetOrder:input_type -> order.v1.GetOrderRequest
-	7, // 6: order.v1.OrderService.ListOrders:input_type -> google.protobuf.Empty
-	5, // 7: order.v1.OrderService.CancelOrder:input_type -> order.v1.GetOrderRequest
-	2, // 8: order.v1.OrderService.CreateOrder:output_type -> order.v1.Order
-	2, // 9: order.v1.OrderService.GetOrder:output_type -> order.v1.Order
-	6, // 10: order.v1.OrderService.ListOrders:output_type -> order.v1.ListOrdersResponse
-	7, // 11: order.v1.OrderService.CancelOrder:output_type -> google.protobuf.Empty
-	8, // [8:12] is the sub-list for method output_type
-	4, // [4:8] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	0,  // 0: order.v1.Order.status:type_name -> order.v1.OrderStatus
+	1,  // 1: order.v1.Order.items:type_name -> order.v1.OrderItem
+	3,  // 2: order.v1.CreateOrderRequest.items:type_name -> order.v1.OrderItemRequest
+	2,  // 3: order.v1.ListOrdersResponse.orders:type_name -> order.v1.Order
+	0,  // 4: order.v1.UpdateOrderStatusRequest.status:type_name -> order.v1.OrderStatus
+	4,  // 5: order.v1.OrderService.CreateOrder:input_type -> order.v1.CreateOrderRequest
+	5,  // 6: order.v1.OrderService.GetOrder:input_type -> order.v1.GetOrderRequest
+	8,  // 7: order.v1.OrderService.ListOrders:input_type -> google.protobuf.Empty
+	5,  // 8: order.v1.OrderService.CancelOrder:input_type -> order.v1.GetOrderRequest
+	7,  // 9: order.v1.OrderService.UpdateOrderStatus:input_type -> order.v1.UpdateOrderStatusRequest
+	2,  // 10: order.v1.OrderService.CreateOrder:output_type -> order.v1.Order
+	2,  // 11: order.v1.OrderService.GetOrder:output_type -> order.v1.Order
+	6,  // 12: order.v1.OrderService.ListOrders:output_type -> order.v1.ListOrdersResponse
+	8,  // 13: order.v1.OrderService.CancelOrder:output_type -> google.protobuf.Empty
+	2,  // 14: order.v1.OrderService.UpdateOrderStatus:output_type -> order.v1.Order
+	10, // [10:15] is the sub-list for method output_type
+	5,  // [5:10] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_microservices_order_proto_order_proto_init() }
@@ -510,7 +570,7 @@ func file_microservices_order_proto_order_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_microservices_order_proto_order_proto_rawDesc), len(file_microservices_order_proto_order_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

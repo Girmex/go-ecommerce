@@ -137,3 +137,28 @@ func (h *Handler) CancelOrder(
 
 	return &emptypb.Empty{}, nil
 }
+
+func (h *Handler) UpdateOrderStatus(
+	ctx context.Context,
+	req *proto.UpdateOrderStatusRequest,
+) (*proto.Order, error) {
+
+	orderStatus, err := toDomainOrderStatus(req.Status)
+	if err != nil {
+		return nil, status.Error(
+			codes.InvalidArgument,
+			err.Error(),
+		)
+	}
+
+	order, err := h.service.UpdateOrderStatus(
+		ctx,
+		uint(req.Id),
+		orderStatus,
+	)
+	if err != nil {
+		return nil, toStatusError(err)
+	}
+
+	return toProtoOrder(order), nil
+}

@@ -12,7 +12,6 @@ import (
 type OrderService struct {
 	repository ports.OrderRepository
 	catalog    ports.CatalogClient
-	
 }
 
 func NewOrderService(
@@ -131,4 +130,17 @@ func (s *OrderService) CancelOrder(
 	order.Status = domain.OrderCancelled
 
 	return s.repository.UpdateOrder(ctx, order)
+}
+
+func (s *OrderService) UpdateOrderStatus(
+	ctx context.Context,
+	id uint,
+	status domain.OrderStatus,
+) (*domain.Order, error) {
+
+	return s.repository.UpdateOrderStatus(
+		ctx,
+		id,
+		status,
+	)
 }
