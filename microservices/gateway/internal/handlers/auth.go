@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	authproto "github.com/Girmex/go-ecommerce/microservices/auth/proto"
+	"github.com/Girmex/go-ecommerce/microservices/gateway/internal/dto"
 )
 
 type AuthHandler struct {
@@ -17,9 +19,55 @@ func NewAuthHandler(client authproto.AuthServiceClient) *AuthHandler {
 }
 
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("register"))
+
+	var req dto.RegisterRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	resp, err := h.AuthClient.Register(
+		r.Context(),
+		&authproto.RegisterRequest{
+			Name:     req.Name,
+			Email:    req.Email,
+			Password: req.Password,
+		},
+	)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	json.NewEncoder(w).Encode(resp)
 }
 
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("login"))
+
+	var req dto.LoginRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	resp, err := h.AuthClient.Login(
+		r.Context(),
+		&authproto.LoginRequest{
+			Email:    req.Email,
+			Password: req.Password,
+		},
+	)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
 }

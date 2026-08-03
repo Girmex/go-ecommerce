@@ -4,20 +4,31 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Girmex/go-ecommerce/microservices/gateway/internal/config"
+	grpcclient "github.com/Girmex/go-ecommerce/microservices/gateway/internal/grpc"
+	"github.com/Girmex/go-ecommerce/microservices/gateway/internal/handlers"
+	"github.com/Girmex/go-ecommerce/microservices/gateway/internal/routes"
 	"github.com/go-chi/chi/v5"
 )
 
 func main() {
 
+	cfg := config.Load()
+
+	clients, err := grpcclient.NewClients(cfg.GRPCAuthHost)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	authHandler := handlers.NewAuthHandler(clients.Auth)
+
 	r := chi.NewRouter()
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Gateway running"))
-	})
+	routes.RegisterRoutes(r, authHandler)
 
-	log.Println("Gateway started on :8080")
+	log.Printf("%s started on :%s", cfg.AppName, cfg.HTTPPort)
 
-	if err := http.ListenAndServe(":8080", r); err != nil {
+	if err := http.ListenAndServe(":"+cfg.HTTPPort, r); err != nil {
 		log.Fatal(err)
 	}
 }

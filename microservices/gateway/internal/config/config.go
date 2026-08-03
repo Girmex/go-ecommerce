@@ -1,27 +1,24 @@
 package config
 
 import (
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
 )
 
 type Config struct {
-	AppName        string
-	AppEnv         string
-	HTTPPort       string
-	GRPCAuthHost   string
+	AppName         string
+	AppEnv          string
+	HTTPPort        string
+	GRPCAuthHost    string
 	GRPCCatalogHost string
-	GRPCOrderHost  string
+	GRPCOrderHost   string
 	GRPCPaymentHost string
-	JWTSecret      string
+	JWTSecret       string
 }
 
 func Load() *Config {
-	if err := godotenv.Load(); err != nil {
-		log.Println(".env file not found, using system environment variables")
-	}
+	_ = godotenv.Load(".env.gateway")
 
 	return &Config{
 		AppName:         os.Getenv("APP_NAME"),
