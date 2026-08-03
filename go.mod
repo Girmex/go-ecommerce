@@ -3,6 +3,7 @@ module github.com/Girmex/go-ecommerce
 go 1.25.6
 
 require (
+	github.com/go-chi/chi/v5 v5.3.1
 	github.com/gofiber/fiber/v2 v2.52.11
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/joho/godotenv v1.5.1

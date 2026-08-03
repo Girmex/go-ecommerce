@@ -7,6 +7,7 @@
 	run-catalog \
 	run-order \
 	run-payment \
+	run-gateway \
 	test
 
 proto-auth:
@@ -45,51 +46,18 @@ proto-payment:
 		microservices/payment/proto/payment.proto	
 
 run-auth:
-	APP_NAME="Auth Service" \
-	APP_ENV=development \
-	GRPC_PORT=50051 \
-	POSTGRES_HOST=localhost \
-	POSTGRES_PORT=5432 \
-	POSTGRES_USER=root \
-	POSTGRES_PASSWORD=root \
-	POSTGRES_DB=auth_db \
-	JWT_SECRET="super-secret-key" \
 	go run ./microservices/auth/cmd
 
 run-catalog:
-	APP_NAME="Catalog Service" \
-	APP_ENV=development \
-	GRPC_PORT=50052 \
-	POSTGRES_HOST=localhost \
-	POSTGRES_PORT=5432 \
-	POSTGRES_USER=root \
-	POSTGRES_PASSWORD=root \
-	POSTGRES_DB=catalog_db \
-	JWT_SECRET="super-secret-key" \
 	go run ./microservices/catalog/cmd
 
 run-order:
-	APP_NAME="Order Service" \
-	APP_ENV=development \
-	GRPC_PORT=50053 \
-	POSTGRES_HOST=localhost \
-	POSTGRES_PORT=5432 \
-	POSTGRES_USER=root \
-	POSTGRES_PASSWORD=root \
-	POSTGRES_DB=order_db \
-	JWT_SECRET="super-secret-key" \
 	go run ./microservices/order/cmd
 
 run-payment:
-	APP_NAME="Payment Service" \
-	APP_ENV=development \
-	GRPC_PORT=50054 \
-	POSTGRES_HOST=localhost \
-	POSTGRES_PORT=5432 \
-	POSTGRES_USER=root \
-	POSTGRES_PASSWORD=root \
-	POSTGRES_DB=payment_db \
-	JWT_SECRET="super-secret-key" \
 	go run ./microservices/payment/cmd
+
+run-gateway:
+	go run ./microservices/gateway/cmd
 test:
 	go test ./...
