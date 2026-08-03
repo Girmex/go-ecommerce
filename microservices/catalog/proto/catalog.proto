@@ -47,6 +47,7 @@ message ListCategoriesResponse {
   repeated Category categories = 1;
 }
 
+
 message CreateProductRequest {
   string name = 1;
   string description = 2;
@@ -54,6 +55,7 @@ message CreateProductRequest {
   string image_url = 4;
   double price = 5;
   uint32 stock = 6;
+  uint32 user_id = 7;
 }
 
 message UpdateProductRequest {

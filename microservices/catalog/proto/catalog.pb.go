@@ -438,6 +438,7 @@ type CreateProductRequest struct {
 	ImageUrl      string                 `protobuf:"bytes,4,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
 	Price         float64                `protobuf:"fixed64,5,opt,name=price,proto3" json:"price,omitempty"`
 	Stock         uint32                 `protobuf:"varint,6,opt,name=stock,proto3" json:"stock,omitempty"`
+	UserId        uint32                 `protobuf:"varint,7,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -510,6 +511,13 @@ func (x *CreateProductRequest) GetPrice() float64 {
 func (x *CreateProductRequest) GetStock() uint32 {
 	if x != nil {
 		return x.Stock
+	}
+	return 0
+}
+
+func (x *CreateProductRequest) GetUserId() uint32 {
+	if x != nil {
+		return x.UserId
 	}
 	return 0
 }
@@ -886,7 +894,7 @@ const file_microservices_catalog_proto_catalog_proto_rawDesc = "" +
 	"\x16ListCategoriesResponse\x124\n" +
 	"\n" +
 	"categories\x18\x01 \x03(\v2\x14.catalog.v1.CategoryR\n" +
-	"categories\"\xb6\x01\n" +
+	"categories\"\xcf\x01\n" +
 	"\x14CreateProductRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1f\n" +
@@ -894,7 +902,8 @@ const file_microservices_catalog_proto_catalog_proto_rawDesc = "" +
 	"categoryId\x12\x1b\n" +
 	"\timage_url\x18\x04 \x01(\tR\bimageUrl\x12\x14\n" +
 	"\x05price\x18\x05 \x01(\x01R\x05price\x12\x14\n" +
-	"\x05stock\x18\x06 \x01(\rR\x05stock\"\xaf\x02\n" +
+	"\x05stock\x18\x06 \x01(\rR\x05stock\x12\x17\n" +
+	"\auser_id\x18\a \x01(\rR\x06userId\"\xaf\x02\n" +
 	"\x14UpdateProductRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\x12\x17\n" +
 	"\x04name\x18\x02 \x01(\tH\x00R\x04name\x88\x01\x01\x12%\n" +

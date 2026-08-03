@@ -1,4 +1,4 @@
-package grpc
+package auth
 
 import (
 	authproto "github.com/Girmex/go-ecommerce/microservices/auth/proto"
@@ -6,21 +6,21 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type Clients struct {
-	Auth authproto.AuthServiceClient
+type Client struct {
+	authproto.AuthServiceClient
 }
 
-func NewClients(authAddr string) (*Clients, error) {
+func New(addr string) (*Client, error) {
 
 	conn, err := grpc.NewClient(
-		authAddr,
+		addr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Clients{
-		Auth: authproto.NewAuthServiceClient(conn),
+	return &Client{
+		AuthServiceClient: authproto.NewAuthServiceClient(conn),
 	}, nil
 }
