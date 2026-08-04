@@ -30,13 +30,25 @@ func RegisterRoutes(
 	r.Route("/catalog", func(r chi.Router) {
 
 		r.Get("/products", catalogHandler.ListProducts)
+		r.Get("/products/{id}", catalogHandler.GetProduct)
+
+		// Categories (public)
+		r.Get("/categories", catalogHandler.ListCategories)
+		r.Get("/categories/{id}", catalogHandler.GetCategory)
 
 		r.Group(func(r chi.Router) {
-
 			r.Use(middleware.JWTMiddleware(jwtManager))
 
-			r.Post("/products", catalogHandler.CreateProduct)
+			// // Categories
+			r.Post("/categories", catalogHandler.CreateCategory)
+			r.Put("/categories/{id}", catalogHandler.UpdateCategory)
+			r.Delete("/categories/{id}", catalogHandler.DeleteCategory)
 
+			r.Post("/products", catalogHandler.CreateProduct)
+			r.Get("/seller/products", catalogHandler.GetSellerProducts)
+			r.Put("/products/{id}", catalogHandler.UpdateProduct)
+			r.Delete("/products/{id}", catalogHandler.DeleteProduct)
+			r.Patch("/products/{id}/stock", catalogHandler.UpdateProductStock)
 		})
 	})
 }

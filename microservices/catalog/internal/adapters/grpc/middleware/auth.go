@@ -12,8 +12,10 @@ import (
 )
 
 var publicMethods = map[string]bool{
-	"/catalog.v1.CatalogService/ListProducts": true,
-	"/catalog.v1.CatalogService/GetProduct":   true,
+	"/catalog.v1.CatalogService/ListCategories": true,
+	"/catalog.v1.CatalogService/GetCategory":    true,
+	"/catalog.v1.CatalogService/ListProducts":   true,
+	"/catalog.v1.CatalogService/GetProduct":     true,
 }
 
 func AuthInterceptor(
