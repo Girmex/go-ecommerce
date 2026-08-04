@@ -6,6 +6,7 @@ import (
 
 	authgrpc "github.com/Girmex/go-ecommerce/microservices/gateway/internal/adapters/grpc/auth"
 	cataloggrpc "github.com/Girmex/go-ecommerce/microservices/gateway/internal/adapters/grpc/catalog"
+	ordergrpc "github.com/Girmex/go-ecommerce/microservices/gateway/internal/adapters/grpc/order"
 	"github.com/Girmex/go-ecommerce/microservices/gateway/internal/adapters/http/handlers"
 	"github.com/Girmex/go-ecommerce/microservices/gateway/internal/config"
 	"github.com/Girmex/go-ecommerce/microservices/gateway/internal/routes"
@@ -27,15 +28,22 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	orderClient, err := ordergrpc.New(cfg.GRPCOrderHost)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	authHandler := handlers.NewAuthHandler(authClient)
 	catalogHandler := handlers.NewCatalogHandler(catalogClient)
+	orderHandler := handlers.NewOrderHandler(orderClient)
 	r := chi.NewRouter()
 
 	routes.RegisterRoutes(
 		r,
 		authHandler,
 		catalogHandler,
+		orderHandler,
 		jwtManager,
 	)
 	log.Printf("%s started on :%s", cfg.AppName, cfg.HTTPPort)

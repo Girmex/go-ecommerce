@@ -13,6 +13,7 @@ func RegisterRoutes(
 	r *chi.Mux,
 	authHandler *handlers.AuthHandler,
 	catalogHandler *handlers.CatalogHandler,
+	orderHandler *handlers.OrderHandler,
 	jwtManager *jwtpkg.JWTManager,
 ) {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
@@ -50,5 +51,12 @@ func RegisterRoutes(
 			r.Delete("/products/{id}", catalogHandler.DeleteProduct)
 			r.Patch("/products/{id}/stock", catalogHandler.UpdateProductStock)
 		})
+	})
+	r.Route("/orders", func(r chi.Router) {
+
+		r.Use(middleware.JWTMiddleware(jwtManager))
+
+		r.Post("/", orderHandler.CreateOrder)
+
 	})
 }
