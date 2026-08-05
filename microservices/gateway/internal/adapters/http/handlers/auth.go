@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	authproto "github.com/Girmex/go-ecommerce/microservices/auth/proto"
+	httpadapter "github.com/Girmex/go-ecommerce/microservices/gateway/internal/adapters/http"
 	"github.com/Girmex/go-ecommerce/microservices/gateway/internal/dto"
 )
 
@@ -37,13 +38,11 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }
 
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
@@ -64,10 +63,9 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }

@@ -7,6 +7,7 @@ import (
 
 	catalogproto "github.com/Girmex/go-ecommerce/microservices/catalog/proto"
 	cataloggrpc "github.com/Girmex/go-ecommerce/microservices/gateway/internal/adapters/grpc/catalog"
+	httpadapter "github.com/Girmex/go-ecommerce/microservices/gateway/internal/adapters/http"
 	"github.com/Girmex/go-ecommerce/microservices/gateway/internal/dto"
 	"github.com/Girmex/go-ecommerce/microservices/gateway/internal/middleware"
 	"github.com/go-chi/chi/v5"
@@ -63,12 +64,11 @@ func (h *CatalogHandler) CreateCategory(
 		grpcReq,
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }
 
 func (h *CatalogHandler) ListCategories(
@@ -81,13 +81,11 @@ func (h *CatalogHandler) ListCategories(
 		&emptypb.Empty{},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }
 
 func (h *CatalogHandler) UpdateCategory(
@@ -137,12 +135,11 @@ func (h *CatalogHandler) UpdateCategory(
 		},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }
 
 func (h *CatalogHandler) GetCategory(
@@ -165,13 +162,11 @@ func (h *CatalogHandler) GetCategory(
 		},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }
 
 func (h *CatalogHandler) DeleteCategory(
@@ -210,11 +205,11 @@ func (h *CatalogHandler) DeleteCategory(
 		},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	httpadapter.WriteNoContent(w)
 }
 
 func (h *CatalogHandler) ListProducts(
@@ -227,13 +222,11 @@ func (h *CatalogHandler) ListProducts(
 		&emptypb.Empty{},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }
 
 func (h *CatalogHandler) CreateProduct(
@@ -276,11 +269,11 @@ func (h *CatalogHandler) CreateProduct(
 		grpcReq,
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }
 
 func (h *CatalogHandler) GetProduct(
@@ -303,12 +296,11 @@ func (h *CatalogHandler) GetProduct(
 		},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }
 
 func (h *CatalogHandler) GetSellerProducts(
@@ -337,13 +329,11 @@ func (h *CatalogHandler) GetSellerProducts(
 		},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }
 
 func (h *CatalogHandler) UpdateProduct(
@@ -415,13 +405,11 @@ func (h *CatalogHandler) UpdateProduct(
 		grpcReq,
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }
 func (h *CatalogHandler) DeleteProduct(
 	w http.ResponseWriter,
@@ -459,11 +447,11 @@ func (h *CatalogHandler) DeleteProduct(
 		},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	httpadapter.WriteNoContent(w)
 }
 
 func (h *CatalogHandler) UpdateProductStock(
@@ -510,11 +498,9 @@ func (h *CatalogHandler) UpdateProductStock(
 		},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }

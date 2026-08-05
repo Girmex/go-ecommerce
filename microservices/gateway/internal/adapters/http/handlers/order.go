@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	ordergrpc "github.com/Girmex/go-ecommerce/microservices/gateway/internal/adapters/grpc/order"
+	httpadapter "github.com/Girmex/go-ecommerce/microservices/gateway/internal/adapters/http"
 	"github.com/Girmex/go-ecommerce/microservices/gateway/internal/dto"
 	"github.com/Girmex/go-ecommerce/microservices/gateway/internal/middleware"
 	orderproto "github.com/Girmex/go-ecommerce/microservices/order/proto"
@@ -90,20 +91,11 @@ func (h *OrderHandler) CreateOrder(
 	)
 
 	if err != nil {
-		http.Error(
-			w,
-			err.Error(),
-			http.StatusInternalServerError,
-		)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set(
-		"Content-Type",
-		"application/json",
-	)
-
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }
 
 func (h *OrderHandler) ListOrders(
@@ -123,12 +115,11 @@ func (h *OrderHandler) ListOrders(
 		&emptypb.Empty{},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }
 func (h *OrderHandler) GetOrder(
 	w http.ResponseWriter,
@@ -157,12 +148,11 @@ func (h *OrderHandler) GetOrder(
 		},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }
 func (h *OrderHandler) CancelOrder(
 	w http.ResponseWriter,
@@ -191,13 +181,12 @@ func (h *OrderHandler) CancelOrder(
 		},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	httpadapter.WriteNoContent(w)
 }
-
 
 func (h *OrderHandler) UpdateOrderStatus(
 	w http.ResponseWriter,
@@ -234,10 +223,9 @@ func (h *OrderHandler) UpdateOrderStatus(
 		},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }

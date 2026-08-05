@@ -14,6 +14,7 @@ func RegisterRoutes(
 	authHandler *handlers.AuthHandler,
 	catalogHandler *handlers.CatalogHandler,
 	orderHandler *handlers.OrderHandler,
+	paymentHandler *handlers.PaymentHandler,
 	jwtManager *jwtpkg.JWTManager,
 ) {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
@@ -62,5 +63,13 @@ func RegisterRoutes(
 		r.Delete("/{id}", orderHandler.CancelOrder)
 		r.Patch("/{id}/status", orderHandler.UpdateOrderStatus)
 
+	})
+	r.Route("/payments", func(r chi.Router) {
+		r.Use(middleware.JWTMiddleware(jwtManager))
+
+		r.Post("/", paymentHandler.CreatePayment)
+		r.Get("/{id}", paymentHandler.GetPayment)
+		r.Patch("/{id}/complete", paymentHandler.CompletePayment)
+		r.Patch("/{id}/fail", paymentHandler.FailPayment)
 	})
 }
