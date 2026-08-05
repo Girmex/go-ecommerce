@@ -3,13 +3,16 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	ordergrpc "github.com/Girmex/go-ecommerce/microservices/gateway/internal/adapters/grpc/order"
 	"github.com/Girmex/go-ecommerce/microservices/gateway/internal/dto"
 	"github.com/Girmex/go-ecommerce/microservices/gateway/internal/middleware"
 	orderproto "github.com/Girmex/go-ecommerce/microservices/order/proto"
+	"github.com/go-chi/chi/v5"
 
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type OrderHandler struct {
@@ -100,5 +103,141 @@ func (h *OrderHandler) CreateOrder(
 		"application/json",
 	)
 
+	json.NewEncoder(w).Encode(resp)
+}
+
+func (h *OrderHandler) ListOrders(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	authHeader := r.Header.Get("Authorization")
+
+	ctx := metadata.AppendToOutgoingContext(
+		r.Context(),
+		"authorization",
+		authHeader,
+	)
+
+	resp, err := h.client.ListOrders(
+		ctx,
+		&emptypb.Empty{},
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
+}
+func (h *OrderHandler) GetOrder(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	idParam := chi.URLParam(r, "id")
+
+	id, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		http.Error(w, "invalid order id", http.StatusBadRequest)
+		return
+	}
+
+	authHeader := r.Header.Get("Authorization")
+
+	ctx := metadata.AppendToOutgoingContext(
+		r.Context(),
+		"authorization",
+		authHeader,
+	)
+
+	resp, err := h.client.GetOrder(
+		ctx,
+		&orderproto.GetOrderRequest{
+			Id: uint32(id),
+		},
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
+}
+func (h *OrderHandler) CancelOrder(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	idParam := chi.URLParam(r, "id")
+
+	id, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		http.Error(w, "invalid order id", http.StatusBadRequest)
+		return
+	}
+
+	authHeader := r.Header.Get("Authorization")
+
+	ctx := metadata.AppendToOutgoingContext(
+		r.Context(),
+		"authorization",
+		authHeader,
+	)
+
+	_, err = h.client.CancelOrder(
+		ctx,
+		&orderproto.GetOrderRequest{
+			Id: uint32(id),
+		},
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+
+func (h *OrderHandler) UpdateOrderStatus(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	idParam := chi.URLParam(r, "id")
+
+	id, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		http.Error(w, "invalid order id", http.StatusBadRequest)
+		return
+	}
+
+	var req dto.UpdateOrderStatusRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	authHeader := r.Header.Get("Authorization")
+
+	ctx := metadata.AppendToOutgoingContext(
+		r.Context(),
+		"authorization",
+		authHeader,
+	)
+
+	resp, err := h.client.UpdateOrderStatus(
+		ctx,
+		&orderproto.UpdateOrderStatusRequest{
+			Id:     uint32(id),
+			Status: orderproto.OrderStatus(req.Status),
+		},
+	)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
 }

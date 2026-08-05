@@ -57,6 +57,10 @@ func RegisterRoutes(
 		r.Use(middleware.JWTMiddleware(jwtManager))
 
 		r.Post("/", orderHandler.CreateOrder)
+		r.Get("/", orderHandler.ListOrders)
+		r.Get("/{id}", orderHandler.GetOrder)
+		r.Delete("/{id}", orderHandler.CancelOrder)
+		r.Patch("/{id}/status", orderHandler.UpdateOrderStatus)
 
 	})
 }
