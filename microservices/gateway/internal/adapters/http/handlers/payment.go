@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	paymentgrpc "github.com/Girmex/go-ecommerce/microservices/gateway/internal/adapters/grpc/payment"
+	httpadapter "github.com/Girmex/go-ecommerce/microservices/gateway/internal/adapters/http"
 	"github.com/Girmex/go-ecommerce/microservices/gateway/internal/dto"
 	"github.com/Girmex/go-ecommerce/microservices/gateway/internal/middleware"
 	paymentproto "github.com/Girmex/go-ecommerce/microservices/payment/proto"
@@ -58,12 +59,11 @@ func (h *PaymentHandler) CreatePayment(
 		grpcReq,
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }
 
 func (h *PaymentHandler) GetPayment(
@@ -93,12 +93,11 @@ func (h *PaymentHandler) GetPayment(
 		},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }
 
 func (h *PaymentHandler) CompletePayment(
@@ -128,12 +127,11 @@ func (h *PaymentHandler) CompletePayment(
 		},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }
 func (h *PaymentHandler) FailPayment(
 	w http.ResponseWriter,
@@ -162,10 +160,9 @@ func (h *PaymentHandler) FailPayment(
 		},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httpadapter.WriteGRPCError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }

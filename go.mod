@@ -22,6 +22,7 @@ require (
 
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
+	github.com/caarlos0/env/v11 v11.4.1
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
