@@ -13,6 +13,7 @@ import (
 	"github.com/Girmex/go-ecommerce/microservices/payment/internal/database"
 	"github.com/Girmex/go-ecommerce/microservices/payment/proto"
 	"github.com/Girmex/go-ecommerce/microservices/pkg/jwt"
+	"github.com/Girmex/go-ecommerce/microservices/pkg/kafka"
 	"google.golang.org/grpc/credentials/insecure"
 
 	"google.golang.org/grpc"
@@ -50,7 +51,12 @@ func main() {
 
 	orderClient := ordergrpc.NewClient(orderConn)
 
-	service := application.NewPaymentService(repository, orderClient)
+	kafkaProducer := kafka.NewProducer(
+		[]string{cfg.KAFKABrokers},
+	)
+	defer kafkaProducer.Close()
+
+	service := application.NewPaymentService(repository, orderClient, kafkaProducer)
 
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(

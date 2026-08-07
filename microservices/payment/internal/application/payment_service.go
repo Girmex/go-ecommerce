@@ -2,23 +2,29 @@ package application
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/Girmex/go-ecommerce/microservices/payment/internal/domain"
 	"github.com/Girmex/go-ecommerce/microservices/payment/internal/ports"
+	"github.com/Girmex/go-ecommerce/microservices/pkg/events"
+	"github.com/Girmex/go-ecommerce/microservices/pkg/kafka"
 )
 
 type PaymentService struct {
-	repository  ports.PaymentRepository
-	orderClient ports.OrderClient
+	repository    ports.PaymentRepository
+	orderClient   ports.OrderClient
+	kafkaProducer *kafka.Producer
 }
 
 func NewPaymentService(
 	repository ports.PaymentRepository,
 	orderClient ports.OrderClient,
+	kafkaProducer *kafka.Producer,
 ) *PaymentService {
 	return &PaymentService{
-		repository:  repository,
-		orderClient: orderClient,
+		repository:    repository,
+		orderClient:   orderClient,
+		kafkaProducer: kafkaProducer,
 	}
 }
 
@@ -74,6 +80,22 @@ func (s *PaymentService) CompletePayment(
 	}
 
 	if err := s.repository.UpdatePayment(ctx, payment); err != nil {
+		return nil, err
+	}
+
+	event := events.PaymentCompleted{
+		PaymentID: payment.ID,
+		OrderID:   payment.OrderID,
+		UserID:    payment.UserID,
+		Amount:    payment.Amount,
+	}
+
+	if err := s.kafkaProducer.Publish(
+		ctx,
+		kafka.TopicPaymentCompleted,
+		strconv.FormatUint(uint64(payment.ID), 10),
+		event,
+	); err != nil {
 		return nil, err
 	}
 

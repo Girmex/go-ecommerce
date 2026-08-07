@@ -15,6 +15,7 @@ type Config struct {
 	PostgresUser     string
 	PostgresPassword string
 	PostgresDatabase string
+	KAFKABrokers     string
 	JWTSecret        string
 }
 
@@ -30,6 +31,7 @@ func Load() *Config {
 		PostgresUser:     os.Getenv("POSTGRES_USER"),
 		PostgresPassword: os.Getenv("POSTGRES_PASSWORD"),
 		PostgresDatabase: os.Getenv("POSTGRES_DB"),
+		KAFKABrokers: os.Getenv("KAFKA_BROKERS"),
 		JWTSecret:        os.Getenv("JWT_SECRET"),
 	}
 }
