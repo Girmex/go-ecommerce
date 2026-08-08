@@ -7,18 +7,35 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/Girmex/go-ecommerce/microservices/notification/internal/adapters/authgrpc"
 	"github.com/Girmex/go-ecommerce/microservices/notification/internal/adapters/email"
 	"github.com/Girmex/go-ecommerce/microservices/notification/internal/adapters/kafka"
 	"github.com/Girmex/go-ecommerce/microservices/notification/internal/adapters/sms"
 	"github.com/Girmex/go-ecommerce/microservices/notification/internal/application"
 	"github.com/Girmex/go-ecommerce/microservices/notification/internal/config"
 	"github.com/Girmex/go-ecommerce/microservices/notification/internal/ports"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
 	cfg := config.Load()
 
 	log.Printf("Starting %s in %s mode...\n", cfg.AppName, cfg.AppEnv)
+
+	// Connect to Auth gRPC service for resolving user profiles
+	authConn, err := grpc.NewClient(
+		"localhost:50051",
+		grpc.WithTransportCredentials(
+			insecure.NewCredentials(),
+		),
+	)
+	if err != nil {
+		log.Fatalf("failed to connect to Auth gRPC service: %v\n", err)
+	}
+	defer authConn.Close()
+
+	authClient := authgrpc.NewClient(authConn)
 
 	// Initialize Email Sender adapter
 	var emailSender ports.EmailSender
@@ -51,7 +68,7 @@ func main() {
 	}
 
 	// Initialize Application Service
-	notificationService := application.NewNotificationService(emailSender, smsSender)
+	notificationService := application.NewNotificationService(emailSender, smsSender, authClient)
 
 	// Context for graceful shutdown
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -64,7 +81,7 @@ func main() {
 		notificationService,
 	)
 
-	log.Printf("Connecting Kafka consumers to brokers: %v\n", cfg.KAFKABrokers)
+	log.Printf("Connecting Kafka consumers to brokers: %v (group: %s)\n", cfg.KAFKABrokers, cfg.ConsumerGroupID)
 
 	if err := listener.Start(ctx); err != nil && err != context.Canceled {
 		log.Fatalf("Notification service error: %v\n", err)

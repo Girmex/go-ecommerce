@@ -7,8 +7,8 @@ import (
 	"log"
 
 	"github.com/Girmex/go-ecommerce/microservices/notification/internal/application"
-	pkgKafka "github.com/Girmex/go-ecommerce/microservices/pkg/kafka"
 	"github.com/Girmex/go-ecommerce/microservices/pkg/events"
+	pkgKafka "github.com/Girmex/go-ecommerce/microservices/pkg/kafka"
 )
 
 type EventListener struct {
@@ -30,7 +30,7 @@ func NewEventListener(
 }
 
 func (l *EventListener) Start(ctx context.Context) error {
-	errChan := make(chan error, 3)
+	errChan := make(chan error, 4)
 
 	// Payment completed consumer
 	go func() {
@@ -86,6 +86,25 @@ func (l *EventListener) Start(ctx context.Context) error {
 		})
 		if err != nil {
 			errChan <- fmt.Errorf("user verification consumer error: %w", err)
+		}
+	}()
+
+	// Order created consumer
+	go func() {
+		consumer := pkgKafka.NewConsumer(l.brokers, pkgKafka.TopicOrderCreated, l.groupID)
+		defer consumer.Close()
+
+		log.Printf("Started Kafka listener for topic: %s\n", pkgKafka.TopicOrderCreated)
+
+		err := consumer.Start(ctx, func(ctx context.Context, key []byte, value []byte) error {
+			var event events.OrderCreated
+			if err := json.Unmarshal(value, &event); err != nil {
+				return fmt.Errorf("failed to unmarshal OrderCreated event: %w", err)
+			}
+			return l.service.HandleOrderCreated(ctx, event)
+		})
+		if err != nil {
+			errChan <- fmt.Errorf("order created consumer error: %w", err)
 		}
 	}()
 

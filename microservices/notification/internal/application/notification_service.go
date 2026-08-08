@@ -12,15 +12,18 @@ import (
 type NotificationService struct {
 	emailSender ports.EmailSender
 	smsSender   ports.SMSSender
+	authClient  ports.AuthClient
 }
 
 func NewNotificationService(
 	emailSender ports.EmailSender,
 	smsSender ports.SMSSender,
+	authClient ports.AuthClient,
 ) *NotificationService {
 	return &NotificationService{
 		emailSender: emailSender,
 		smsSender:   smsSender,
+		authClient:  authClient,
 	}
 }
 
@@ -29,8 +32,20 @@ func (s *NotificationService) HandlePaymentCompleted(
 	event events.PaymentCompleted,
 ) error {
 	var errs []error
+	userEmail := event.Email
+	userPhone := event.Phone
 
-	if event.Email != "" && s.emailSender != nil {
+	// Resolve missing user details from Auth service via gRPC
+	if userEmail == "" && event.UserID != 0 && s.authClient != nil {
+		user, err := s.authClient.GetUser(ctx, event.UserID)
+		if err != nil {
+			log.Printf("[WARN] Failed to resolve user profile for UserID %d: %v\n", event.UserID, err)
+		} else if user != nil {
+			userEmail = user.Email
+		}
+	}
+
+	if userEmail != "" && s.emailSender != nil {
 		subject := "Payment Completed"
 		body := fmt.Sprintf(
 			"Your payment #%d for order #%d has been completed successfully. Amount: $%.2f",
@@ -39,15 +54,15 @@ func (s *NotificationService) HandlePaymentCompleted(
 			event.Amount,
 		)
 
-		if err := s.emailSender.Send(ctx, event.Email, subject, body); err != nil {
-			log.Printf("failed to send payment completed email to %s: %v\n", event.Email, err)
+		if err := s.emailSender.Send(ctx, userEmail, subject, body); err != nil {
+			log.Printf("failed to send payment completed email to %s: %v\n", userEmail, err)
 			errs = append(errs, err)
 		}
-	} else if event.Email == "" {
+	} else if userEmail == "" {
 		log.Printf("[WARN] PaymentCompleted event #%d for user #%d has no recipient email specified\n", event.PaymentID, event.UserID)
 	}
 
-	if event.Phone != "" && s.smsSender != nil {
+	if userPhone != "" && s.smsSender != nil {
 		message := fmt.Sprintf(
 			"Payment #%d for order #%d of $%.2f is complete.",
 			event.PaymentID,
@@ -55,8 +70,8 @@ func (s *NotificationService) HandlePaymentCompleted(
 			event.Amount,
 		)
 
-		if err := s.smsSender.Send(ctx, event.Phone, message); err != nil {
-			log.Printf("failed to send payment completed SMS to %s: %v\n", event.Phone, err)
+		if err := s.smsSender.Send(ctx, userPhone, message); err != nil {
+			log.Printf("failed to send payment completed SMS to %s: %v\n", userPhone, err)
 			errs = append(errs, err)
 		}
 	}
@@ -94,4 +109,30 @@ func (s *NotificationService) HandleUserVerification(
 	body := fmt.Sprintf("Please use the following verification code to confirm your email: %s", event.Token)
 
 	return s.emailSender.Send(ctx, event.Email, subject, body)
+}
+
+func (s *NotificationService) HandleOrderCreated(
+	ctx context.Context,
+	event events.OrderCreated,
+) error {
+	userEmail := ""
+
+	// Resolve user email via Auth gRPC client
+	if event.UserID != 0 && s.authClient != nil {
+		user, err := s.authClient.GetUser(ctx, event.UserID)
+		if err != nil {
+			log.Printf("[WARN] Failed to resolve user for order #%d: %v\n", event.OrderID, err)
+		} else if user != nil {
+			userEmail = user.Email
+		}
+	}
+
+	if userEmail != "" && s.emailSender != nil {
+		subject := "Order Confirmation"
+		body := fmt.Sprintf("Your order #%d has been placed successfully. Total Amount: $%.2f", event.OrderID, event.Amount)
+
+		return s.emailSender.Send(ctx, userEmail, subject, body)
+	}
+
+	return nil
 }
