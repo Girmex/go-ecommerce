@@ -3,9 +3,9 @@ package grpc
 import (
 	"context"
 
-	"github.com/Girmex/go-ecommerce/microservices/auth/proto"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/application"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/dto"
+	"github.com/Girmex/go-ecommerce/microservices/auth/proto"
 )
 
 type Handler struct {
@@ -59,4 +59,16 @@ func (h *Handler) Login(
 		RefreshToken: output.RefreshToken,
 		User:         toProtoUser(output.User),
 	}, nil
+}
+
+func (h *Handler) GetUser(
+	ctx context.Context,
+	req *proto.GetUserRequest,
+) (*proto.User, error) {
+
+	user, err := h.service.GetUserByID(ctx, uint(req.Id))
+	if err != nil {
+		return nil, toStatusError(err)
+	}
+	return toProtoUser(user), nil
 }

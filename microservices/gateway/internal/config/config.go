@@ -18,8 +18,7 @@ type Config struct {
 }
 
 func Load() *Config {
-	_ = godotenv.Load(".env.gateway")
-
+	_ = godotenv.Load("microservices/gateway/.env.gateway")
 	return &Config{
 		AppName:         os.Getenv("APP_NAME"),
 		AppEnv:          os.Getenv("APP_ENV"),

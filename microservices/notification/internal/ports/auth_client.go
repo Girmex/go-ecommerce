@@ -1,11 +1,16 @@
 package ports
 
-import (
-	"context"
+import "context"
 
-	authproto "github.com/Girmex/go-ecommerce/microservices/auth/proto"
-)
+type User struct {
+	ID    uint
+	Name  string
+	Email string
+}
 
-type AuthClient interface {
-	GetUser(ctx context.Context, userID uint) (*authproto.User, error)
+type UserClient interface {
+	GetUser(
+		ctx context.Context,
+		userID uint,
+	) (*User, error)
 }

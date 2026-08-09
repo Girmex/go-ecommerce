@@ -7,13 +7,13 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/Girmex/go-ecommerce/microservices/notification/internal/adapters/authgrpc"
-	"github.com/Girmex/go-ecommerce/microservices/notification/internal/adapters/email"
-	"github.com/Girmex/go-ecommerce/microservices/notification/internal/adapters/kafka"
-	"github.com/Girmex/go-ecommerce/microservices/notification/internal/adapters/sms"
+	authgrpc "github.com/Girmex/go-ecommerce/microservices/notification/internal/adapters/authgrpc"
+	emailadapter "github.com/Girmex/go-ecommerce/microservices/notification/internal/adapters/email"
+	kafkaadapter "github.com/Girmex/go-ecommerce/microservices/notification/internal/adapters/kafka"
 	"github.com/Girmex/go-ecommerce/microservices/notification/internal/application"
 	"github.com/Girmex/go-ecommerce/microservices/notification/internal/config"
-	"github.com/Girmex/go-ecommerce/microservices/notification/internal/ports"
+	kafkapkg "github.com/Girmex/go-ecommerce/microservices/pkg/kafka"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -21,71 +21,87 @@ import (
 func main() {
 	cfg := config.Load()
 
-	log.Printf("Starting %s in %s mode...\n", cfg.AppName, cfg.AppEnv)
+	// Context cancelled when the process receives SIGINT/SIGTERM.
+	ctx, stop := signal.NotifyContext(
+		context.Background(),
+		os.Interrupt,
+		syscall.SIGTERM,
+	)
+	defer stop()
 
-	// Connect to Auth gRPC service for resolving user profiles
+	// --------------------------------------------------
+	// Auth gRPC connection
+	// --------------------------------------------------
+
 	authConn, err := grpc.NewClient(
-		"localhost:50051",
+		cfg.AuthGRPCAddress,
 		grpc.WithTransportCredentials(
 			insecure.NewCredentials(),
 		),
 	)
 	if err != nil {
-		log.Fatalf("failed to connect to Auth gRPC service: %v\n", err)
+		log.Fatal(err)
 	}
 	defer authConn.Close()
 
-	authClient := authgrpc.NewClient(authConn)
+	userClient := authgrpc.NewClient(authConn)
 
-	// Initialize Email Sender adapter
-	var emailSender ports.EmailSender
-	if cfg.EmailProvider == "smtp" {
-		log.Printf("Using SMTP Email Sender (%s:%s)\n", cfg.SMTPHost, cfg.SMTPPort)
-		emailSender = email.NewSMTPEmailSender(
-			cfg.SMTPHost,
-			cfg.SMTPPort,
-			cfg.SMTPUsername,
-			cfg.SMTPPassword,
-			cfg.SMTPFrom,
-		)
-	} else {
-		log.Println("Using Logger Email Sender (Console)")
-		emailSender = email.NewLoggerEmailSender()
-	}
+	// --------------------------------------------------
+	// Email adapter
+	// --------------------------------------------------
 
-	// Initialize SMS Sender adapter
-	var smsSender ports.SMSSender
-	if cfg.SMSProvider == "twilio" {
-		log.Println("Using Twilio SMS Sender")
-		smsSender = sms.NewTwilioSMSSender(
-			cfg.TwilioAccountSID,
-			cfg.TwilioAuthToken,
-			cfg.TwilioFromPhone,
-		)
-	} else {
-		log.Println("Using Logger SMS Sender (Console)")
-		smsSender = sms.NewLoggerSMSSender()
-	}
+	emailSender := emailadapter.NewSMTPSender(
+		cfg.SMTPHost,
+		cfg.SMTPPort,
+		cfg.SMTPUsername,
+		cfg.SMTPPassword,
+		cfg.SMTPFrom,
+	)
 
-	// Initialize Application Service
-	notificationService := application.NewNotificationService(emailSender, smsSender, authClient)
+	// --------------------------------------------------
+	// Application service
+	// --------------------------------------------------
 
-	// Context for graceful shutdown
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
+	notificationService := application.NewNotificationService(
+		userClient,
+		emailSender,
+	)
 
-	// Initialize and start Kafka Listener
-	listener := kafka.NewEventListener(
-		cfg.KAFKABrokers,
-		cfg.ConsumerGroupID,
+	// --------------------------------------------------
+	// Kafka consumer
+	// --------------------------------------------------
+
+	consumer := kafkapkg.NewConsumer(
+		[]string{cfg.KAFKABrokers},
+		kafkapkg.TopicPaymentCompleted,
+		"notification-service",
+	)
+
+	defer consumer.Close()
+
+	paymentConsumer := kafkaadapter.NewPaymentCompletedConsumer(
+		consumer,
 		notificationService,
 	)
 
-	log.Printf("Connecting Kafka consumers to brokers: %v (group: %s)\n", cfg.KAFKABrokers, cfg.ConsumerGroupID)
+	// --------------------------------------------------
+	// Start
+	// --------------------------------------------------
 
-	if err := listener.Start(ctx); err != nil && err != context.Canceled {
-		log.Fatalf("Notification service error: %v\n", err)
+	log.Printf(
+		"%s started",
+		cfg.AppName,
+	)
+
+	if err := paymentConsumer.Start(ctx); err != nil {
+		if ctx.Err() != nil {
+			log.Println("Notification Service shutting down")
+			return
+		}
+
+		log.Fatalf(
+			"notification consumer: %v",
+			err,
+		)
 	}
-
-	log.Println("Notification service shut down gracefully.")
 }

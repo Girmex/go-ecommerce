@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"time"
+
 	"github.com/joho/godotenv"
 )
 
@@ -24,8 +25,7 @@ type Config struct {
 
 func Load() *Config {
 
-	_ = godotenv.Load(".env.auth")
-	
+	_ = godotenv.Load("microservices/auth/.env.auth")
 	return &Config{
 		AppName: os.Getenv("APP_NAME"),
 		AppEnv:  os.Getenv("APP_ENV"),

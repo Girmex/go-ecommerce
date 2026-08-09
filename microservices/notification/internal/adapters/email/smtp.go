@@ -4,11 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net/smtp"
-
-	"github.com/Girmex/go-ecommerce/microservices/notification/internal/ports"
 )
 
-type SMTPEmailSender struct {
+type SMTPSender struct {
 	host     string
 	port     string
 	username string
@@ -16,8 +14,14 @@ type SMTPEmailSender struct {
 	from     string
 }
 
-func NewSMTPEmailSender(host, port, username, password, from string) ports.EmailSender {
-	return &SMTPEmailSender{
+func NewSMTPSender(
+	host string,
+	port string,
+	username string,
+	password string,
+	from string,
+) *SMTPSender {
+	return &SMTPSender{
 		host:     host,
 		port:     port,
 		username: username,
@@ -26,19 +30,51 @@ func NewSMTPEmailSender(host, port, username, password, from string) ports.Email
 	}
 }
 
-func (s *SMTPEmailSender) Send(
+func (s *SMTPSender) Send(
 	ctx context.Context,
 	to string,
 	subject string,
 	body string,
 ) error {
-	addr := fmt.Sprintf("%s:%s", s.host, s.port)
-	auth := smtp.PlainAuth("", s.username, s.password, s.host)
 
-	msg := []byte(fmt.Sprintf("To: %s\r\nSubject: %s\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n%s", to, subject, body))
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+	}
 
-	if err := smtp.SendMail(addr, auth, s.from, []string{to}, msg); err != nil {
-		return fmt.Errorf("failed to send SMTP email: %w", err)
+	auth := smtp.PlainAuth(
+		"",
+		s.username,
+		s.password,
+		s.host,
+	)
+
+	message := []byte(
+		"From: " + s.from + "\r\n" +
+			"To: " + to + "\r\n" +
+			"Subject: " + subject + "\r\n" +
+			"\r\n" +
+			body,
+	)
+
+	address := fmt.Sprintf(
+		"%s:%s",
+		s.host,
+		s.port,
+	)
+
+	if err := smtp.SendMail(
+		address,
+		auth,
+		s.from,
+		[]string{to},
+		message,
+	); err != nil {
+		return fmt.Errorf(
+			"send email: %w",
+			err,
+		)
 	}
 
 	return nil

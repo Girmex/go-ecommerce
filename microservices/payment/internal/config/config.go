@@ -20,8 +20,7 @@ type Config struct {
 }
 
 func Load() *Config {
-	_ = godotenv.Load(".env.payment")
-	
+	_ = godotenv.Load("microservices/payment/.env.payment")
 	return &Config{
 		AppName:          os.Getenv("APP_NAME"),
 		AppEnv:           os.Getenv("APP_ENV"),
@@ -31,7 +30,7 @@ func Load() *Config {
 		PostgresUser:     os.Getenv("POSTGRES_USER"),
 		PostgresPassword: os.Getenv("POSTGRES_PASSWORD"),
 		PostgresDatabase: os.Getenv("POSTGRES_DB"),
-		KAFKABrokers: os.Getenv("KAFKA_BROKERS"),
+		KAFKABrokers:     os.Getenv("KAFKA_BROKERS"),
 		JWTSecret:        os.Getenv("JWT_SECRET"),
 	}
 }

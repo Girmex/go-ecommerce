@@ -48,6 +48,7 @@ proto-payment:
 run-auth:
 	go run ./microservices/auth/cmd
 
+
 run-catalog:
 	go run ./microservices/catalog/cmd
 
@@ -56,6 +57,9 @@ run-order:
 
 run-payment:
 	go run ./microservices/payment/cmd
+
+run-notification:
+	go run ./microservices/notification/cmd
 
 run-gateway:
 	go run ./microservices/gateway/cmd

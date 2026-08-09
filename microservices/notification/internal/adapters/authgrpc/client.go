@@ -2,42 +2,45 @@ package authgrpc
 
 import (
 	"context"
+	"fmt"
 
-	authproto "github.com/Girmex/go-ecommerce/microservices/auth/proto"
+	"github.com/Girmex/go-ecommerce/microservices/auth/proto"
+	"github.com/Girmex/go-ecommerce/microservices/notification/internal/ports"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 )
 
+var _ ports.UserClient = (*Client)(nil)
+
 type Client struct {
-	client authproto.AuthServiceClient
+	client proto.AuthServiceClient
 }
 
 func NewClient(conn *grpc.ClientConn) *Client {
 	return &Client{
-		client: authproto.NewAuthServiceClient(conn),
+		client: proto.NewAuthServiceClient(conn),
 	}
 }
 
 func (c *Client) GetUser(
 	ctx context.Context,
 	userID uint,
-) (*authproto.User, error) {
-
-	if md, ok := metadata.FromIncomingContext(ctx); ok {
-		authHeaders := md.Get("authorization")
-		if len(authHeaders) > 0 {
-			ctx = metadata.AppendToOutgoingContext(
-				ctx,
-				"authorization",
-				authHeaders[0],
-			)
-		}
-	}
-
-	return c.client.GetUser(
+) (*ports.User, error) {
+	resp, err := c.client.GetUser(
 		ctx,
-		&authproto.GetUserRequest{
+		&proto.GetUserRequest{
 			Id: uint32(userID),
 		},
 	)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"get user from auth service: %w",
+			err,
+		)
+	}
+
+	return &ports.User{
+		ID:    uint(resp.Id),
+		Name:  resp.Name,
+		Email: resp.Email,
+	}, nil
 }
