@@ -7,5 +7,7 @@ const (
 
 	TopicUserVerification = "user.email.verification"
 
+	TopicUserPhoneVerification = "user.phone.verification"
+
 	TopicOrderCreated = "order.created"
 )

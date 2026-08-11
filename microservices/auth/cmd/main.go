@@ -5,13 +5,15 @@ import (
 	"net"
 
 	grpcadapter "github.com/Girmex/go-ecommerce/microservices/auth/internal/adapters/grpc"
+	kafkadapter "github.com/Girmex/go-ecommerce/microservices/auth/internal/adapters/kafka"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/adapters/persistence"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/adapters/persistence/models"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/application"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/config"
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/database"
-	"github.com/Girmex/go-ecommerce/microservices/pkg/jwt"
 	"github.com/Girmex/go-ecommerce/microservices/auth/proto"
+	"github.com/Girmex/go-ecommerce/microservices/pkg/jwt"
+	"github.com/Girmex/go-ecommerce/microservices/pkg/kafka"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -29,16 +31,29 @@ func main() {
 	// Auto migrate persistence models
 	if err := db.AutoMigrate(
 		&models.UserModel{},
+		&models.PhoneVerificationModel{},
 	); err != nil {
 		log.Fatal(err)
 	}
 
 	repository := persistence.NewAuthRepository(db)
 
+	phoneVerificationRepo := persistence.NewPhoneVerificationRepository(db)
+
 	jwtManager := jwt.NewJWTManager(cfg.JWTSecret)
+
+	kafkaProducer := kafka.NewProducer(
+		[]string{cfg.KAFKABrokers},
+	)
+
+	eventPublisher := kafkadapter.NewEventPublisher(
+		kafkaProducer,
+	)
 
 	service := application.NewAuthService(
 		repository,
+		eventPublisher,
+		phoneVerificationRepo,
 		jwtManager,
 	)
 	handler := grpcadapter.NewHandler(service)

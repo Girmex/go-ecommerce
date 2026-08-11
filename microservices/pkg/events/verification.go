@@ -1,7 +1,7 @@
 package events
 
-type UserVerification struct {
+type UserPhoneVerification struct {
 	UserID uint   `json:"user_id"`
-	Email  string `json:"email"`
-	Token  string `json:"token"`
+	Phone  string `json:"phone"`
+	Code   string `json:"code"`
 }

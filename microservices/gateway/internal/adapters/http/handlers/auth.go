@@ -34,6 +34,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			Name:     req.Name,
 			Email:    req.Email,
 			Password: req.Password,
+			Phone:    req.Phone,
 		},
 	)
 

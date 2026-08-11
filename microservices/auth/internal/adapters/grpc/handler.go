@@ -29,12 +29,14 @@ func (h *Handler) Register(
 		Name:     req.Name,
 		Email:    req.Email,
 		Password: req.Password,
+		Phone:    req.Phone,
 	}
 
 	user, err := h.service.Register(ctx, input)
 	if err != nil {
 		return nil, toStatusError(err)
 	}
+
 	return &proto.RegisterResponse{
 		User: toProtoUser(user),
 	}, nil
@@ -71,4 +73,23 @@ func (h *Handler) GetUser(
 		return nil, toStatusError(err)
 	}
 	return toProtoUser(user), nil
+}
+
+func (h *Handler) RequestPhoneVerification(
+	ctx context.Context,
+	req *proto.RequestPhoneVerificationRequest,
+) (*proto.RequestPhoneVerificationResponse, error) {
+
+	user, err := h.service.GetUserByID(ctx, uint(req.UserId))
+	if err != nil {
+		return nil, toStatusError(err)
+	}
+
+	if err := h.service.RequestPhoneVerification(ctx, user); err != nil {
+		return nil, toStatusError(err)
+	}
+
+	return &proto.RequestPhoneVerificationResponse{
+		Sent: true,
+	}, nil
 }

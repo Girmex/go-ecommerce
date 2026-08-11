@@ -1,19 +1,21 @@
 package dto
+
 import "github.com/Girmex/go-ecommerce/microservices/auth/internal/domain"
 
 type RegisterInput struct {
-    Name     string
-    Email    string
-    Password string
+	Name     string
+	Email    string
+	Password string
+	Phone    string
 }
 
 type LoginInput struct {
-    Email    string
-    Password string
+	Email    string
+	Password string
 }
 
 type LoginOutput struct {
-    AccessToken  string
-    RefreshToken string
-    User         *domain.User
+	AccessToken  string
+	RefreshToken string
+	User         *domain.User
 }

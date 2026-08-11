@@ -1,22 +1,32 @@
 syntax = "proto3";
 
 package auth.v1;
+
 option go_package = "github.com/Girmex/go-ecommerce/microservices/auth/api/proto;proto";
+
 import "google/protobuf/empty.proto";
 
 message User {
   uint32 id = 1;
   string name = 2;
   string email = 3;
+  string phone = 4;
+  bool phone_verified = 5;
 }
 
 message RegisterRequest {
   string name = 1;
   string email = 2;
   string password = 3;
+  string phone = 4;
 }
+
 message RegisterResponse {
   User user = 1;
+}
+
+message RequestPhoneVerificationResponse {
+  bool sent = 1;
 }
 
 message LoginRequest {
@@ -47,10 +57,19 @@ message ValidateTokenResponse {
   string email = 2;
 }
 
-service AuthService {
+message RequestPhoneVerificationRequest {
+  uint32 user_id = 1;
+}
 
+
+
+service AuthService {
   rpc Register(RegisterRequest)
       returns (RegisterResponse);
+
+   rpc RequestPhoneVerification(
+    RequestPhoneVerificationRequest
+  ) returns (RequestPhoneVerificationResponse);
 
   rpc Login(LoginRequest)
       returns (LoginResponse);
@@ -62,10 +81,6 @@ service AuthService {
       returns (ValidateTokenResponse);
 
   rpc Logout(LogoutRequest)
-    returns (google.protobuf.Empty);
-
+      returns (google.protobuf.Empty);
+  
 }
-
-
-
-

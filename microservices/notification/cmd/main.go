@@ -33,6 +33,8 @@ func main() {
 	// Auth gRPC connection
 	// --------------------------------------------------
 
+	
+
 	authConn, err := grpc.NewClient(
 		cfg.AuthGRPCAddress,
 		grpc.WithTransportCredentials(

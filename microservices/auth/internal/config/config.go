@@ -13,6 +13,8 @@ type Config struct {
 
 	GRPCPort string
 
+	KAFKABrokers string
+
 	PostgresHost     string
 	PostgresPort     string
 	PostgresUser     string
@@ -30,8 +32,8 @@ func Load() *Config {
 		AppName: os.Getenv("APP_NAME"),
 		AppEnv:  os.Getenv("APP_ENV"),
 
-		GRPCPort: os.Getenv("GRPC_PORT"),
-
+		GRPCPort:         os.Getenv("GRPC_PORT"),
+		KAFKABrokers:     os.Getenv("KAFKA_BROKERS"),
 		PostgresHost:     os.Getenv("POSTGRES_HOST"),
 		PostgresPort:     os.Getenv("POSTGRES_PORT"),
 		PostgresUser:     os.Getenv("POSTGRES_USER"),
