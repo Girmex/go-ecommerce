@@ -63,8 +63,12 @@ func main() {
 	// SMS adapter
 	// --------------------------------------------------
 
-	smsSender := smsadapter.NewLoggingSMSSender()
-
+	//smsSender := smsadapter.NewLoggingSMSSender()
+	smsSender := smsadapter.NewTwilioSMSSender(
+		cfg.TwilioAccountSID,
+		cfg.TwilioAuthToken,
+		cfg.TwilioFromPhone,
+	)
 	// --------------------------------------------------
 	// Application service
 	// --------------------------------------------------

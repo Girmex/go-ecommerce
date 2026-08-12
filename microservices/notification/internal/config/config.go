@@ -19,6 +19,10 @@ type Config struct {
 	SMTPUsername string
 	SMTPPassword string
 	SMTPFrom     string
+
+	TwilioAccountSID string
+	TwilioAuthToken  string
+	TwilioFromPhone  string
 }
 
 func Load() *Config {
@@ -37,5 +41,9 @@ func Load() *Config {
 		SMTPUsername: os.Getenv("SMTP_USERNAME"),
 		SMTPPassword: os.Getenv("SMTP_PASSWORD"),
 		SMTPFrom:     os.Getenv("SMTP_FROM"),
+
+		TwilioAccountSID: os.Getenv("TWILIO_ACCOUNT_SID"),
+		TwilioAuthToken:  os.Getenv("TWILIO_AUTH_TOKEN"),
+		TwilioFromPhone:  os.Getenv("TWILIO_FROM_PHONE"),
 	}
 }
