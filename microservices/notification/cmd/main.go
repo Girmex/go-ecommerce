@@ -10,6 +10,7 @@ import (
 	authgrpc "github.com/Girmex/go-ecommerce/microservices/notification/internal/adapters/authgrpc"
 	emailadapter "github.com/Girmex/go-ecommerce/microservices/notification/internal/adapters/email"
 	kafkaadapter "github.com/Girmex/go-ecommerce/microservices/notification/internal/adapters/kafka"
+	smsadapter "github.com/Girmex/go-ecommerce/microservices/notification/internal/adapters/sms"
 	"github.com/Girmex/go-ecommerce/microservices/notification/internal/application"
 	"github.com/Girmex/go-ecommerce/microservices/notification/internal/config"
 	kafkapkg "github.com/Girmex/go-ecommerce/microservices/pkg/kafka"
@@ -32,8 +33,6 @@ func main() {
 	// --------------------------------------------------
 	// Auth gRPC connection
 	// --------------------------------------------------
-
-	
 
 	authConn, err := grpc.NewClient(
 		cfg.AuthGRPCAddress,
@@ -61,28 +60,52 @@ func main() {
 	)
 
 	// --------------------------------------------------
+	// SMS adapter
+	// --------------------------------------------------
+
+	smsSender := smsadapter.NewLoggingSMSSender()
+
+	// --------------------------------------------------
 	// Application service
 	// --------------------------------------------------
 
 	notificationService := application.NewNotificationService(
 		userClient,
 		emailSender,
+		smsSender,
 	)
 
 	// --------------------------------------------------
-	// Kafka consumer
+	// Payment completed Kafka consumer
 	// --------------------------------------------------
 
-	consumer := kafkapkg.NewConsumer(
+	paymentKafkaConsumer := kafkapkg.NewConsumer(
 		[]string{cfg.KAFKABrokers},
 		kafkapkg.TopicPaymentCompleted,
-		"notification-service",
+		"notification-payment-service",
 	)
 
-	defer consumer.Close()
+	defer paymentKafkaConsumer.Close()
 
 	paymentConsumer := kafkaadapter.NewPaymentCompletedConsumer(
-		consumer,
+		paymentKafkaConsumer,
+		notificationService,
+	)
+
+	// --------------------------------------------------
+	// Phone verification Kafka consumer
+	// --------------------------------------------------
+
+	phoneKafkaConsumer := kafkapkg.NewConsumer(
+		[]string{cfg.KAFKABrokers},
+		kafkapkg.TopicUserPhoneVerification,
+		"notification-phone-verification-service",
+	)
+
+	defer phoneKafkaConsumer.Close()
+
+	phoneConsumer := kafkaadapter.NewPhoneVerificationConsumer(
+		phoneKafkaConsumer,
 		notificationService,
 	)
 
@@ -95,7 +118,18 @@ func main() {
 		cfg.AppName,
 	)
 
-	if err := paymentConsumer.Start(ctx); err != nil {
+	errCh := make(chan error, 2)
+
+	go func() {
+		errCh <- paymentConsumer.Start(ctx)
+	}()
+
+	go func() {
+		errCh <- phoneConsumer.Start(ctx)
+	}()
+
+	select {
+	case err := <-errCh:
 		if ctx.Err() != nil {
 			log.Println("Notification Service shutting down")
 			return
@@ -105,5 +139,8 @@ func main() {
 			"notification consumer: %v",
 			err,
 		)
+
+	case <-ctx.Done():
+		log.Println("Notification Service shutting down")
 	}
 }

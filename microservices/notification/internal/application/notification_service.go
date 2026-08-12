@@ -11,15 +11,18 @@ import (
 type NotificationService struct {
 	userClient  ports.UserClient
 	emailSender ports.EmailSender
+	smsSender   ports.SMSSender
 }
 
 func NewNotificationService(
 	userClient ports.UserClient,
 	emailSender ports.EmailSender,
+	smsSender ports.SMSSender,
 ) *NotificationService {
 	return &NotificationService{
 		userClient:  userClient,
 		emailSender: emailSender,
+		smsSender:   smsSender,
 	}
 }
 
@@ -60,6 +63,30 @@ func (s *NotificationService) HandlePaymentCompleted(
 	); err != nil {
 		return fmt.Errorf(
 			"send payment notification: %w",
+			err,
+		)
+	}
+
+	return nil
+}
+
+func (s *NotificationService) HandlePhoneVerification(
+	ctx context.Context,
+	event events.UserPhoneVerification,
+) error {
+
+	message := fmt.Sprintf(
+		"Your verification code is %s. It expires in 5 minutes.",
+		event.Code,
+	)
+
+	if err := s.smsSender.Send(
+		ctx,
+		event.Phone,
+		message,
+	); err != nil {
+		return fmt.Errorf(
+			"send phone verification SMS: %w",
 			err,
 		)
 	}
