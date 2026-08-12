@@ -45,6 +45,7 @@ func main() {
 	kafkaProducer := kafka.NewProducer(
 		[]string{cfg.KAFKABrokers},
 	)
+	defer kafkaProducer.Close()
 
 	eventPublisher := kafkadapter.NewEventPublisher(
 		kafkaProducer,
@@ -52,8 +53,8 @@ func main() {
 
 	service := application.NewAuthService(
 		repository,
-		eventPublisher,
 		phoneVerificationRepo,
+		eventPublisher,
 		jwtManager,
 	)
 	handler := grpcadapter.NewHandler(service)

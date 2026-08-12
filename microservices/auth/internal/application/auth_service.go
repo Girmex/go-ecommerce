@@ -13,22 +13,22 @@ import (
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/ports"
 	"github.com/Girmex/go-ecommerce/microservices/pkg/events"
 	"github.com/Girmex/go-ecommerce/microservices/pkg/jwt"
+	"github.com/Girmex/go-ecommerce/microservices/pkg/kafka"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
 	repository            ports.AuthRepository
-	eventPublisher        ports.EventPublisher
 	phoneVerificationRepo ports.PhoneVerificationRepository
+	eventPublisher        ports.EventPublisher
 	jwtManager            *jwt.JWTManager
 }
 
-func NewAuthService(repository ports.AuthRepository, eventPublisher ports.EventPublisher, phoneVerificationRepo ports.PhoneVerificationRepository, jwtManager *jwt.JWTManager,
-) *AuthService {
+func NewAuthService(repository ports.AuthRepository, phoneVerificationRepo ports.PhoneVerificationRepository, eventPublisher ports.EventPublisher, jwtManager *jwt.JWTManager) *AuthService {
 	return &AuthService{
 		repository:            repository,
-		eventPublisher:        eventPublisher,
 		phoneVerificationRepo: phoneVerificationRepo,
+		eventPublisher:        eventPublisher,
 		jwtManager:            jwtManager,
 	}
 }
@@ -65,6 +65,12 @@ func (s *AuthService) Register(
 
 	if err := s.repository.CreateUser(ctx, user); err != nil {
 		return nil, err
+	}
+
+	if user.Phone != "" {
+		if err := s.RequestPhoneVerification(ctx, user); err != nil {
+			return nil, err
+		}
 	}
 
 	return user, nil
@@ -137,12 +143,13 @@ func (s *AuthService) RequestPhoneVerification(
 	ctx context.Context,
 	user *domain.User,
 ) error {
+
 	code, err := helpers.GenerateOTP()
 	if err != nil {
 		return err
 	}
 
-	codeHash, err := bcrypt.GenerateFromPassword(
+	hash, err := bcrypt.GenerateFromPassword(
 		[]byte(code),
 		bcrypt.DefaultCost,
 	)
@@ -153,7 +160,7 @@ func (s *AuthService) RequestPhoneVerification(
 	verification := &domain.PhoneVerification{
 		UserID:    user.ID,
 		Phone:     user.Phone,
-		CodeHash:  string(codeHash),
+		CodeHash:  string(hash),
 		ExpiresAt: time.Now().Add(5 * time.Minute),
 		Used:      false,
 	}
@@ -173,7 +180,7 @@ func (s *AuthService) RequestPhoneVerification(
 
 	if err := s.eventPublisher.Publish(
 		ctx,
-		"user.phone_verification",
+		kafka.TopicUserPhoneVerification,
 		strconv.FormatUint(uint64(user.ID), 10),
 		event,
 	); err != nil {

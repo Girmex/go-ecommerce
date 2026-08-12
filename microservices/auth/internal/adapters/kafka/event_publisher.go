@@ -3,14 +3,19 @@ package kafka
 import (
 	"context"
 
+	"github.com/Girmex/go-ecommerce/microservices/auth/internal/ports"
 	kafkapkg "github.com/Girmex/go-ecommerce/microservices/pkg/kafka"
 )
+
+var _ ports.EventPublisher = (*EventPublisher)(nil)
 
 type EventPublisher struct {
 	producer *kafkapkg.Producer
 }
 
-func NewEventPublisher(producer *kafkapkg.Producer) *EventPublisher {
+func NewEventPublisher(
+	producer *kafkapkg.Producer,
+) *EventPublisher {
 	return &EventPublisher{
 		producer: producer,
 	}
