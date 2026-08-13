@@ -93,3 +93,28 @@ func (h *Handler) RequestPhoneVerification(
 		Sent: true,
 	}, nil
 }
+
+func (h *Handler) VerifyPhone(
+	ctx context.Context,
+	req *proto.VerifyPhoneRequest,
+) (*proto.VerifyPhoneResponse, error) {
+
+	user, err := h.service.VerifyPhone(
+		ctx,
+		uint(req.UserId),
+		req.Code,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.VerifyPhoneResponse{
+		User: &proto.User{
+			Id:            uint32(user.ID),
+			Name:          user.Name,
+			Email:         user.Email,
+			Phone:         user.Phone,
+			PhoneVerified: user.PhoneVerified,
+		},
+	}, nil
+}

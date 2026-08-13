@@ -61,6 +61,15 @@ message RequestPhoneVerificationRequest {
   uint32 user_id = 1;
 }
 
+message VerifyPhoneRequest {
+  uint32 user_id = 1;
+  string code = 2;
+}
+
+message VerifyPhoneResponse {
+  User user = 1;
+}
+
 
 
 service AuthService {
@@ -82,5 +91,7 @@ service AuthService {
 
   rpc Logout(LogoutRequest)
       returns (google.protobuf.Empty);
+  rpc VerifyPhone(VerifyPhoneRequest)
+    returns (VerifyPhoneResponse);
   
 }

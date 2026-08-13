@@ -7,13 +7,12 @@
 package proto
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -595,6 +594,102 @@ func (x *RequestPhoneVerificationRequest) GetUserId() uint32 {
 	return 0
 }
 
+type VerifyPhoneRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint32                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VerifyPhoneRequest) Reset() {
+	*x = VerifyPhoneRequest{}
+	mi := &file_microservices_auth_proto_auth_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VerifyPhoneRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VerifyPhoneRequest) ProtoMessage() {}
+
+func (x *VerifyPhoneRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_microservices_auth_proto_auth_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VerifyPhoneRequest.ProtoReflect.Descriptor instead.
+func (*VerifyPhoneRequest) Descriptor() ([]byte, []int) {
+	return file_microservices_auth_proto_auth_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *VerifyPhoneRequest) GetUserId() uint32 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *VerifyPhoneRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+type VerifyPhoneResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	User          *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VerifyPhoneResponse) Reset() {
+	*x = VerifyPhoneResponse{}
+	mi := &file_microservices_auth_proto_auth_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VerifyPhoneResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VerifyPhoneResponse) ProtoMessage() {}
+
+func (x *VerifyPhoneResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_microservices_auth_proto_auth_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VerifyPhoneResponse.ProtoReflect.Descriptor instead.
+func (*VerifyPhoneResponse) Descriptor() ([]byte, []int) {
+	return file_microservices_auth_proto_auth_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *VerifyPhoneResponse) GetUser() *User {
+	if x != nil {
+		return x.User
+	}
+	return nil
+}
+
 var File_microservices_auth_proto_auth_proto protoreflect.FileDescriptor
 
 const file_microservices_auth_proto_auth_proto_rawDesc = "" +
@@ -632,14 +727,20 @@ const file_microservices_auth_proto_auth_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\rR\x06userId\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\":\n" +
 	"\x1fRequestPhoneVerificationRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\rR\x06userId2\xb4\x03\n" +
+	"\auser_id\x18\x01 \x01(\rR\x06userId\"A\n" +
+	"\x12VerifyPhoneRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\rR\x06userId\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\"8\n" +
+	"\x13VerifyPhoneResponse\x12!\n" +
+	"\x04user\x18\x01 \x01(\v2\r.auth.v1.UserR\x04user2\xfe\x03\n" +
 	"\vAuthService\x12?\n" +
 	"\bRegister\x12\x18.auth.v1.RegisterRequest\x1a\x19.auth.v1.RegisterResponse\x12o\n" +
 	"\x18RequestPhoneVerification\x12(.auth.v1.RequestPhoneVerificationRequest\x1a).auth.v1.RequestPhoneVerificationResponse\x126\n" +
 	"\x05Login\x12\x15.auth.v1.LoginRequest\x1a\x16.auth.v1.LoginResponse\x121\n" +
 	"\aGetUser\x12\x17.auth.v1.GetUserRequest\x1a\r.auth.v1.User\x12N\n" +
 	"\rValidateToken\x12\x1d.auth.v1.ValidateTokenRequest\x1a\x1e.auth.v1.ValidateTokenResponse\x128\n" +
-	"\x06Logout\x12\x16.auth.v1.LogoutRequest\x1a\x16.google.protobuf.EmptyBCZAgithub.com/Girmex/go-ecommerce/microservices/auth/api/proto;protob\x06proto3"
+	"\x06Logout\x12\x16.auth.v1.LogoutRequest\x1a\x16.google.protobuf.Empty\x12H\n" +
+	"\vVerifyPhone\x12\x1b.auth.v1.VerifyPhoneRequest\x1a\x1c.auth.v1.VerifyPhoneResponseBCZAgithub.com/Girmex/go-ecommerce/microservices/auth/api/proto;protob\x06proto3"
 
 var (
 	file_microservices_auth_proto_auth_proto_rawDescOnce sync.Once
@@ -653,7 +754,7 @@ func file_microservices_auth_proto_auth_proto_rawDescGZIP() []byte {
 	return file_microservices_auth_proto_auth_proto_rawDescData
 }
 
-var file_microservices_auth_proto_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_microservices_auth_proto_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_microservices_auth_proto_auth_proto_goTypes = []any{
 	(*User)(nil),                             // 0: auth.v1.User
 	(*RegisterRequest)(nil),                  // 1: auth.v1.RegisterRequest
@@ -666,28 +767,33 @@ var file_microservices_auth_proto_auth_proto_goTypes = []any{
 	(*ValidateTokenRequest)(nil),             // 8: auth.v1.ValidateTokenRequest
 	(*ValidateTokenResponse)(nil),            // 9: auth.v1.ValidateTokenResponse
 	(*RequestPhoneVerificationRequest)(nil),  // 10: auth.v1.RequestPhoneVerificationRequest
-	(*emptypb.Empty)(nil),                    // 11: google.protobuf.Empty
+	(*VerifyPhoneRequest)(nil),               // 11: auth.v1.VerifyPhoneRequest
+	(*VerifyPhoneResponse)(nil),              // 12: auth.v1.VerifyPhoneResponse
+	(*emptypb.Empty)(nil),                    // 13: google.protobuf.Empty
 }
 var file_microservices_auth_proto_auth_proto_depIdxs = []int32{
 	0,  // 0: auth.v1.RegisterResponse.user:type_name -> auth.v1.User
 	0,  // 1: auth.v1.LoginResponse.user:type_name -> auth.v1.User
-	1,  // 2: auth.v1.AuthService.Register:input_type -> auth.v1.RegisterRequest
-	10, // 3: auth.v1.AuthService.RequestPhoneVerification:input_type -> auth.v1.RequestPhoneVerificationRequest
-	4,  // 4: auth.v1.AuthService.Login:input_type -> auth.v1.LoginRequest
-	7,  // 5: auth.v1.AuthService.GetUser:input_type -> auth.v1.GetUserRequest
-	8,  // 6: auth.v1.AuthService.ValidateToken:input_type -> auth.v1.ValidateTokenRequest
-	6,  // 7: auth.v1.AuthService.Logout:input_type -> auth.v1.LogoutRequest
-	2,  // 8: auth.v1.AuthService.Register:output_type -> auth.v1.RegisterResponse
-	3,  // 9: auth.v1.AuthService.RequestPhoneVerification:output_type -> auth.v1.RequestPhoneVerificationResponse
-	5,  // 10: auth.v1.AuthService.Login:output_type -> auth.v1.LoginResponse
-	0,  // 11: auth.v1.AuthService.GetUser:output_type -> auth.v1.User
-	9,  // 12: auth.v1.AuthService.ValidateToken:output_type -> auth.v1.ValidateTokenResponse
-	11, // 13: auth.v1.AuthService.Logout:output_type -> google.protobuf.Empty
-	8,  // [8:14] is the sub-list for method output_type
-	2,  // [2:8] is the sub-list for method input_type
-	2,  // [2:2] is the sub-list for extension type_name
-	2,  // [2:2] is the sub-list for extension extendee
-	0,  // [0:2] is the sub-list for field type_name
+	0,  // 2: auth.v1.VerifyPhoneResponse.user:type_name -> auth.v1.User
+	1,  // 3: auth.v1.AuthService.Register:input_type -> auth.v1.RegisterRequest
+	10, // 4: auth.v1.AuthService.RequestPhoneVerification:input_type -> auth.v1.RequestPhoneVerificationRequest
+	4,  // 5: auth.v1.AuthService.Login:input_type -> auth.v1.LoginRequest
+	7,  // 6: auth.v1.AuthService.GetUser:input_type -> auth.v1.GetUserRequest
+	8,  // 7: auth.v1.AuthService.ValidateToken:input_type -> auth.v1.ValidateTokenRequest
+	6,  // 8: auth.v1.AuthService.Logout:input_type -> auth.v1.LogoutRequest
+	11, // 9: auth.v1.AuthService.VerifyPhone:input_type -> auth.v1.VerifyPhoneRequest
+	2,  // 10: auth.v1.AuthService.Register:output_type -> auth.v1.RegisterResponse
+	3,  // 11: auth.v1.AuthService.RequestPhoneVerification:output_type -> auth.v1.RequestPhoneVerificationResponse
+	5,  // 12: auth.v1.AuthService.Login:output_type -> auth.v1.LoginResponse
+	0,  // 13: auth.v1.AuthService.GetUser:output_type -> auth.v1.User
+	9,  // 14: auth.v1.AuthService.ValidateToken:output_type -> auth.v1.ValidateTokenResponse
+	13, // 15: auth.v1.AuthService.Logout:output_type -> google.protobuf.Empty
+	12, // 16: auth.v1.AuthService.VerifyPhone:output_type -> auth.v1.VerifyPhoneResponse
+	10, // [10:17] is the sub-list for method output_type
+	3,  // [3:10] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_microservices_auth_proto_auth_proto_init() }
@@ -701,7 +807,7 @@ func file_microservices_auth_proto_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_microservices_auth_proto_auth_proto_rawDesc), len(file_microservices_auth_proto_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

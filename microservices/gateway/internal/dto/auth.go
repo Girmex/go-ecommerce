@@ -11,3 +11,8 @@ type LoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+type VerifyPhoneRequest struct {
+	UserID uint32 `json:"user_id"`
+	Code   string `json:"code"`
+}

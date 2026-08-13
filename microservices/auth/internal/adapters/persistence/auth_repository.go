@@ -74,7 +74,7 @@ func (repo *AuthRepository) GetUserByEmail(ctx context.Context, email string) (*
 
 	return toUserDomain(&model), nil
 }
-func (r *AuthRepository) UpdateRefreshToken(ctx context.Context,userID uint,refreshToken string,
+func (r *AuthRepository) UpdateRefreshToken(ctx context.Context, userID uint, refreshToken string,
 ) error {
 
 	return r.db.WithContext(ctx).
@@ -82,4 +82,23 @@ func (r *AuthRepository) UpdateRefreshToken(ctx context.Context,userID uint,refr
 		Where("id = ?", userID).
 		Update("refresh_token", refreshToken).
 		Error
+}
+func (r *AuthRepository) MarkPhoneVerified(
+	ctx context.Context,
+	userID uint,
+) error {
+	result := r.db.WithContext(ctx).
+		Model(&models.UserModel{}).
+		Where("id = ?", userID).
+		Update("phone_verified", true)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return domain.ErrUserNotFound
+	}
+
+	return nil
 }

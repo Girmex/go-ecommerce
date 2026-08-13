@@ -189,3 +189,57 @@ func (s *AuthService) RequestPhoneVerification(
 
 	return nil
 }
+
+func (s *AuthService) VerifyPhone(
+	ctx context.Context,
+	userID uint,
+	code string,
+) (*domain.User, error) {
+
+	verification, err := s.phoneVerificationRepo.GetLatestByUserID(
+		ctx,
+		userID,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if verification.Used {
+		return nil, domain.ErrPhoneVerificationUsed
+	}
+
+	if verification.IsExpired(time.Now()) {
+		return nil, domain.ErrPhoneVerificationExpired
+	}
+
+	if err := bcrypt.CompareHashAndPassword(
+		[]byte(verification.CodeHash),
+		[]byte(code),
+	); err != nil {
+		return nil, domain.ErrInvalidPhoneVerification
+	}
+
+	if err := s.phoneVerificationRepo.MarkUsed(
+		ctx,
+		verification,
+	); err != nil {
+		return nil, err
+	}
+
+	if err := s.repository.MarkPhoneVerified(
+		ctx,
+		userID,
+	); err != nil {
+		return nil, err
+	}
+
+	user, err := s.repository.GetUserByID(
+		ctx,
+		userID,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}

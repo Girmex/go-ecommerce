@@ -17,4 +17,5 @@ var (
 	ErrPhoneVerificationNotFound = errors.New("phone verification not found")
 	ErrPhoneVerificationExpired  = errors.New("phone verification expired")
 	ErrPhoneVerificationUsed     = errors.New("phone verification already used")
+	ErrInvalidPhoneVerification  = errors.New("invalid phone verification code")
 )

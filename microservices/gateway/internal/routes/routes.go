@@ -27,6 +27,7 @@ func RegisterRoutes(
 		// next we'll implement these
 		r.Post("/register", authHandler.Register)
 		r.Post("/login", authHandler.Login)
+		r.Post("/verify-phone", authHandler.VerifyPhone)
 	})
 
 	r.Route("/catalog", func(r chi.Router) {

@@ -1,29 +1,35 @@
 package ports
+
 import (
 	"context"
+
 	"github.com/Girmex/go-ecommerce/microservices/auth/internal/domain"
 )
 
 type AuthRepository interface {
+	CreateUser(
+		ctx context.Context,
+		user *domain.User,
+	) error
 
-    CreateUser(
-        ctx context.Context,
-        user *domain.User,
-    ) error
+	GetUserByID(
+		ctx context.Context,
+		id uint,
+	) (*domain.User, error)
 
-    GetUserByID(
-        ctx context.Context,
-        id uint,
-    ) (*domain.User, error)
+	GetUserByEmail(
+		ctx context.Context,
+		email string,
+	) (*domain.User, error)
 
-    GetUserByEmail(
-        ctx context.Context,
-        email string,
-    ) (*domain.User, error)
-    
-    UpdateRefreshToken(
-    ctx context.Context,
-    userID uint,
-    refreshToken string,
-) error
+	UpdateRefreshToken(
+		ctx context.Context,
+		userID uint,
+		refreshToken string,
+	) error
+
+	MarkPhoneVerified(
+		ctx context.Context,
+		userID uint,
+	) error
 }

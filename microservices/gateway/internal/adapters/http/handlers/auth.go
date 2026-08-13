@@ -70,3 +70,28 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	httpadapter.WriteJSON(w, http.StatusOK, resp)
 }
+
+func (h *AuthHandler) VerifyPhone(w http.ResponseWriter, r *http.Request) {
+
+	var req dto.VerifyPhoneRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	resp, err := h.AuthClient.VerifyPhone(
+		r.Context(),
+		&authproto.VerifyPhoneRequest{
+			UserId: req.UserID,
+			Code:   req.Code,
+		},
+	)
+
+	if err != nil {
+		httpadapter.WriteGRPCError(w, err)
+		return
+	}
+
+	httpadapter.WriteJSON(w, http.StatusOK, resp)
+}
