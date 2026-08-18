@@ -34,10 +34,6 @@ type UserRepository interface{
 	FindOrders(uId uint) ([]domain.Order, error)
 	FindOrderById(id uint, uId uint) (domain.Order, error)
 
-	
-
-
-
 }
 
 type userRepository struct{

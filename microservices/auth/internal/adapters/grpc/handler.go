@@ -105,7 +105,7 @@ func (h *Handler) VerifyPhone(
 		req.Code,
 	)
 	if err != nil {
-		return nil, err
+		return nil, toStatusError(err)
 	}
 
 	return &proto.VerifyPhoneResponse{

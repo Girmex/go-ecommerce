@@ -1,14 +1,15 @@
 package api
 
 import (
-	"github.com/gofiber/fiber/v2/middleware/cors"
+	"log"
+
 	"github.com/Girmex/go-ecommerce/monolith/config"
 	"github.com/Girmex/go-ecommerce/monolith/internal/api/rest"
 	"github.com/Girmex/go-ecommerce/monolith/internal/api/rest/handlers"
 	"github.com/Girmex/go-ecommerce/monolith/internal/domain"
 	"github.com/Girmex/go-ecommerce/monolith/internal/helper"
 	"github.com/Girmex/go-ecommerce/monolith/pkg/payment"
-	"log"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/driver/postgres"
@@ -64,10 +65,10 @@ func StartServer(config config.AppConfig) {
 	paymentClient := payment.NewPaymentClient(config.StripeSecret)
 
 	rh := &rest.RestHandler{
-		App:    app,
-		DB:     db,
-		Auth:   auth,
-		Config: config,
+		App:           app,
+		DB:            db,
+		Auth:          auth,
+		Config:        config,
 		PaymentClient: paymentClient,
 	}
 
@@ -78,10 +79,10 @@ func StartServer(config config.AppConfig) {
 }
 
 func setupRoutes(rh *rest.RestHandler) {
-	// catalog
-	handlers.SetupCatalogRoutes(rh)
 	// user handler
 	handlers.SetupUserRoutes(rh)
+	// catalog
+	handlers.SetupCatalogRoutes(rh)
 	// transactions
 	handlers.SetupTransactionRoutes(rh)
 }
