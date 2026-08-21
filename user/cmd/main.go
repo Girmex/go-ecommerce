@@ -45,7 +45,7 @@ func main() {
 	)
 
 	handler := httpadapter.NewHandler(userService)
-	router := httpadapter.NewRouter(handler)
+	router := httpadapter.NewRouter(handler, tokenService)
 
 	log.Printf("user service listening on :%s", cfg.HTTPPort)
 

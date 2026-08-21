@@ -26,3 +26,31 @@ func (s *JWTService) Generate(userID uint) (string, error) {
 
 	return token.SignedString(s.secret)
 }
+
+func (s *JWTService) Validate(tokenString string) (uint, error) {
+	token, err := jwt.Parse(
+		tokenString,
+		func(token *jwt.Token) (interface{}, error) {
+			if token.Method != jwt.SigningMethodHS256 {
+				return nil, jwt.ErrSignatureInvalid
+			}
+
+			return s.secret, nil
+		},
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return 0, jwt.ErrTokenInvalidClaims
+	}
+
+	userID, ok := claims["user_id"].(float64)
+	if !ok {
+		return 0, jwt.ErrTokenInvalidClaims
+	}
+
+	return uint(userID), nil
+}

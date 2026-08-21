@@ -1,8 +1,10 @@
 package application
 
 import (
+	"context"
 	"errors"
 
+	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/domain"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/ports"
 )
 
@@ -25,4 +27,11 @@ func NewUserService(
 		repository:   repository,
 		tokenService: tokenService,
 	}
+}
+
+func (s *UserService) GetUser(
+	ctx context.Context,
+	id uint,
+) (*domain.User, error) {
+	return s.repository.GetByID(ctx, id)
 }
