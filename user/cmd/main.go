@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 
+	httpadapter "github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/adapters/http"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/adapters/persistence"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/application"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/config"
@@ -15,10 +17,7 @@ func main() {
 
 	ctx := context.Background()
 
-	db, err := database.NewPostgresPool(
-		ctx,
-		cfg.DatabaseURL,
-	)
+	db, err := database.NewPostgresPool(ctx, cfg.DatabaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,10 +35,14 @@ func main() {
 	}
 
 	userRepository := persistence.NewUserRepository(db)
-
 	userService := application.NewUserService(userRepository)
 
-	_ = userService
+	handler := httpadapter.NewHandler(userService)
+	router := httpadapter.NewRouter(handler)
 
-	log.Println("user service started")
+	log.Printf("user service listening on :%s", cfg.HTTPPort)
+
+	if err := http.ListenAndServe(":"+cfg.HTTPPort, router); err != nil {
+		log.Fatal(err)
+	}
 }
