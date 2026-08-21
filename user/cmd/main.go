@@ -13,6 +13,15 @@ import (
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/database"
 )
 
+// @title User Service API
+// @version 1.0
+// @description User microservice for the eCommerce application.
+// @host localhost:8080
+// @BasePath /
+//
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 	cfg := config.Load()
 

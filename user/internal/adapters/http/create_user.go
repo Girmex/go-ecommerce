@@ -10,6 +10,18 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+// CreateUser godoc
+// @Summary Create user
+// @Description Creates a new user.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param user body dto.CreateUserRequest true "User"
+// @Success 201 {object} dto.UserResponse
+// @Failure 400 {object} map[string]string
+// @Failure 409 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /users [post]
 func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var req dto.CreateUserRequest
 

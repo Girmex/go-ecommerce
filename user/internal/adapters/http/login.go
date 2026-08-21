@@ -9,6 +9,18 @@ import (
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/application"
 )
 
+// Login godoc
+// @Summary Login
+// @Description Authenticates a user and returns a JWT.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param credentials body dto.LoginRequest true "Login credentials"
+// @Success 200 {object} dto.LoginResponse
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /users/login [post]
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	var req dto.LoginRequest
 

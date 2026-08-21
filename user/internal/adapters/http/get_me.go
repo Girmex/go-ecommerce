@@ -9,7 +9,16 @@ import (
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/adapters/http/middleware"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/domain"
 )
-
+// @Summary Get current user
+// @Description Returns the currently authenticated user.
+// @Tags Users
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} dto.UserResponse
+// @Failure 401 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /users/me [get]
 func (h *Handler) GetMe(w http.ResponseWriter, r *http.Request) {
 	userID, ok := middleware.UserID(r.Context())
 	if !ok {
