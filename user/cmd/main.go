@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/adapters/auth"
 	httpadapter "github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/adapters/http"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/adapters/persistence"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/application"
@@ -35,7 +36,13 @@ func main() {
 	}
 
 	userRepository := persistence.NewUserRepository(db)
-	userService := application.NewUserService(userRepository)
+
+	tokenService := auth.NewJWTService(cfg.JWTSecret)
+
+	userService := application.NewUserService(
+		userRepository,
+		tokenService,
+	)
 
 	handler := httpadapter.NewHandler(userService)
 	router := httpadapter.NewRouter(handler)
