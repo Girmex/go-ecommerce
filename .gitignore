@@ -1,0 +1,14 @@
+cat > .gitignore <<'EOF'
+# Environment files
+.env
+.env.*
+
+# Go
+bin/
+dist/
+coverage.out
+
+# IDE
+.vscode/
+.idea/
+EOF
