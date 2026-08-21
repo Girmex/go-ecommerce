@@ -1,0 +1,45 @@
+### Health
+GET http://localhost:8080/health
+
+
+### Create User
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "name": "Girma",
+  "email": "girma@example.com",
+  "password": "password123"
+}
+
+### Validation - Empty Name
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "name": "",
+  "email": "girma@example.com",
+  "password": "password123"
+}
+
+
+### Validation - Invalid Email
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "name": "Girma",
+  "email": "not-an-email",
+  "password": "password123"
+}
+
+
+### Validation - Short Password
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "name": "Girma",
+  "email": "another@example.com",
+  "password": "123"
+}

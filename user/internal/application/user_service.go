@@ -5,6 +5,8 @@ import (
 	"errors"
 	"strings"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/domain"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/ports"
 )
@@ -28,18 +30,17 @@ func (s *UserService) CreateUser(
 	ctx context.Context,
 	name string,
 	email string,
-	passwordHash string,
+	password string,
 ) (*domain.User, error) {
-
 	name = strings.TrimSpace(name)
 	email = strings.TrimSpace(email)
 
-	if name == "" || email == "" || passwordHash == "" {
+	if name == "" || email == "" || password == "" {
 		return nil, ErrInvalidInput
 	}
 
 	existingUser, err := s.repository.GetByEmail(ctx, email)
-	if err != nil {
+	if err != nil && !errors.Is(err, domain.ErrUserNotFound) {
 		return nil, err
 	}
 
@@ -47,10 +48,18 @@ func (s *UserService) CreateUser(
 		return nil, ErrUserAlreadyExists
 	}
 
+	passwordHash, err := bcrypt.GenerateFromPassword(
+		[]byte(password),
+		bcrypt.DefaultCost,
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	user := &domain.User{
 		Name:         name,
 		Email:        email,
-		PasswordHash: passwordHash,
+		PasswordHash: string(passwordHash),
 	}
 
 	if err := s.repository.Create(ctx, user); err != nil {

@@ -6,6 +6,6 @@ func NewRouter(handler *Handler) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Get("/health", handler.Health)
-
+	r.Post("/users", handler.CreateUser)
 	return r
 }
