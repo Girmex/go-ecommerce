@@ -1,0 +1,199 @@
+basePath: /
+definitions:
+  http.CreateOrderItemRequest:
+    properties:
+      product_id:
+        example: b3c1...
+        type: string
+      quantity:
+        example: 2
+        type: integer
+    required:
+    - product_id
+    - quantity
+    type: object
+  http.CreateOrderRequest:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/http.CreateOrderItemRequest'
+        minItems: 1
+        type: array
+      payment_method:
+        enum:
+        - card
+        - wallet
+        - bank_transfer
+        example: card
+        type: string
+      user_id:
+        type: string
+    required:
+    - items
+    - payment_method
+    - user_id
+    type: object
+  http.ErrorResponse:
+    properties:
+      code:
+        type: string
+      details: {}
+      message:
+        type: string
+    type: object
+  http.OrderItemResponse:
+    properties:
+      product_id:
+        type: string
+      quantity:
+        type: integer
+      subtotal:
+        type: number
+      unit_price:
+        type: number
+    type: object
+  http.OrderResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/http.OrderItemResponse'
+        type: array
+      payment_id:
+        type: string
+      status:
+        type: string
+      total:
+        type: number
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+host: localhost:8082
+info:
+  contact: {}
+  description: Order microservice for the eCommerce application.
+  title: Order Service API
+  version: "1.0"
+paths:
+  /orders:
+    get:
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/http.OrderResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: List a user's orders
+      tags:
+      - orders
+    post:
+      consumes:
+      - application/json
+      description: Creates an order and reserves stock for each product.
+      parameters:
+      - description: Order payload
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/http.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http.OrderResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Place an order
+      tags:
+      - orders
+  /orders/{id}:
+    get:
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.OrderResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Get an order by ID
+      tags:
+      - orders
+  /orders/{id}/cancel:
+    post:
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.OrderResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Cancel an order
+      tags:
+      - orders
+swagger: "2.0"
+tags:
+- description: Order management endpoints
+  name: orders
