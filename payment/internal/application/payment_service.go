@@ -1,0 +1,112 @@
+package application
+
+import (
+	"context"
+	"time"
+
+	"github.com/google/uuid"
+
+	"github.com/Girmex/go-ecommerce-app/chi-microservice/payment/internal/domain"
+	"github.com/Girmex/go-ecommerce-app/chi-microservice/payment/internal/port"
+)
+
+type PaymentService struct {
+	repository port.PaymentRepository
+	gateway    port.PaymentGateway
+}
+
+func NewPaymentService(
+	repository port.PaymentRepository,
+	gateway port.PaymentGateway,
+) port.PaymentService {
+	return &PaymentService{
+		repository: repository,
+		gateway:    gateway,
+	}
+}
+
+func (s *PaymentService) Charge(
+	ctx context.Context,
+	input port.ChargeInput,
+) (*domain.Payment, error) {
+
+	now := time.Now().UTC()
+
+	payment := &domain.Payment{
+		ID:            uuid.NewString(),
+		OrderID:       input.OrderID,
+		UserID:        input.UserID,
+		Amount:        input.Amount,
+		Method:        input.Method,
+		Status:        domain.StatusPending,
+		CreatedAt:     now,
+		UpdatedAt:     now,
+	}
+
+	if err := s.repository.Create(ctx, payment); err != nil {
+		return nil, err
+	}
+
+	result, err := s.gateway.Charge(
+		ctx,
+		input.Amount,
+		input.Method,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	payment.UpdatedAt = time.Now().UTC()
+
+	if result.Approved {
+		payment.Status = domain.StatusPaid
+		payment.GatewayTxnRef = result.TxnRef
+	} else {
+		payment.Status = domain.StatusDeclined
+	}
+
+	if err := s.repository.Update(ctx, payment); err != nil {
+		return nil, err
+	}
+
+	if !result.Approved {
+		return payment, domain.ErrPaymentDeclined
+	}
+
+	return payment, nil
+}
+
+func (s *PaymentService) Get(
+	ctx context.Context,
+	id string,
+) (*domain.Payment, error) {
+
+	return s.repository.GetByID(ctx, id)
+}
+
+func (s *PaymentService) List(
+	ctx context.Context,
+) ([]*domain.Payment, error) {
+
+	return s.repository.List(ctx)
+}
+
+func (s *PaymentService) Refund(
+	ctx context.Context,
+	id string,
+) (*domain.Payment, error) {
+
+	payment, err := s.repository.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	payment.Status = domain.StatusRefunded
+	payment.UpdatedAt = time.Now().UTC()
+
+	if err := s.repository.Update(ctx, payment); err != nil {
+		return nil, err
+	}
+
+	return payment, nil
+}

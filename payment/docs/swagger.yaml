@@ -1,0 +1,169 @@
+basePath: /
+definitions:
+  http.ChargeRequest:
+    properties:
+      amount:
+        example: 59.98
+        type: number
+      method:
+        enum:
+        - card
+        - wallet
+        - bank_transfer
+        example: card
+        type: string
+      order_id:
+        example: b3c1d7e2-1234-4567-8901-abcdef123456
+        type: string
+      user_id:
+        example: a1b2c3d4-1234-4567-8901-abcdef123456
+        type: string
+    required:
+    - amount
+    - method
+    - order_id
+    - user_id
+    type: object
+  http.ErrorResponse:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  http.PaymentResponse:
+    properties:
+      amount:
+        type: number
+      created_at:
+        type: string
+      gateway_txn_ref:
+        type: string
+      id:
+        type: string
+      method:
+        type: string
+      order_id:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+host: localhost:8084
+info:
+  contact: {}
+  description: Payment microservice for the eCommerce application.
+  title: Payment Service API
+  version: "1.0"
+paths:
+  /payments:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/http.PaymentResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: List payments
+      tags:
+      - payments
+    post:
+      consumes:
+      - application/json
+      description: Creates a payment and attempts to charge it through the payment
+        gateway.
+      parameters:
+      - description: Charge payload
+        in: body
+        name: payment
+        required: true
+        schema:
+          $ref: '#/definitions/http.ChargeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http.PaymentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "402":
+          description: Payment Required
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Charge a payment for an order
+      tags:
+      - payments
+  /payments/{id}:
+    get:
+      parameters:
+      - description: Payment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.PaymentResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Get a payment by ID
+      tags:
+      - payments
+  /payments/{id}/refund:
+    post:
+      parameters:
+      - description: Payment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.PaymentResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Refund a payment
+      tags:
+      - payments
+swagger: "2.0"
+tags:
+- description: Payment management endpoints
+  name: payments
