@@ -6,7 +6,7 @@ import (
 
 type ChargeRequest struct {
 	OrderID string  `json:"order_id" validate:"required,uuid" example:"b3c1d7e2-1234-4567-8901-abcdef123456"`
-	UserID  string  `json:"user_id" validate:"required,uuid" example:"a1b2c3d4-1234-4567-8901-abcdef123456"`
+	UserID  uint    `json:"user_id" validate:"required" example:"1234567890"`
 	Amount  float64 `json:"amount" validate:"required,gt=0" example:"59.98"`
 	Method  string  `json:"method" validate:"required,oneof=card wallet bank_transfer" example:"card"`
 }
@@ -14,7 +14,7 @@ type ChargeRequest struct {
 type PaymentResponse struct {
 	ID            string  `json:"id"`
 	OrderID       string  `json:"order_id"`
-	UserID        string  `json:"user_id"`
+	UserID        uint    `json:"user_id"`
 	Amount        float64 `json:"amount"`
 	Method        string  `json:"method"`
 	Status        string  `json:"status"`

@@ -8,7 +8,7 @@ import (
 
 type ChargeInput struct {
 	OrderID string
-	UserID  string
+	UserID  uint
 	Amount  float64
 	Method  string
 }

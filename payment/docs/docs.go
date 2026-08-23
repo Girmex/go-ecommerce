@@ -17,13 +17,18 @@ const docTemplate = `{
     "paths": {
         "/payments": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "payments"
                 ],
-                "summary": "List payments",
+                "summary": "List authenticated user's payments",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -32,6 +37,12 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/http.PaymentResponse"
                             }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
                         }
                     },
                     "500": {
@@ -43,6 +54,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates a payment and attempts to charge it through the payment gateway.",
                 "consumes": [
                     "application/json"
@@ -78,6 +94,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/http.ErrorResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
                     "402": {
                         "description": "Payment Required",
                         "schema": {
@@ -95,6 +117,11 @@ const docTemplate = `{
         },
         "/payments/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -118,6 +145,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/http.PaymentResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
@@ -135,6 +168,11 @@ const docTemplate = `{
         },
         "/payments/{id}/refund": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -156,6 +194,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/http.PaymentResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
                         }
                     },
                     "404": {
@@ -202,8 +246,8 @@ const docTemplate = `{
                     "example": "b3c1d7e2-1234-4567-8901-abcdef123456"
                 },
                 "user_id": {
-                    "type": "string",
-                    "example": "a1b2c3d4-1234-4567-8901-abcdef123456"
+                    "type": "integer",
+                    "example": 1234567890
                 }
             }
         },
@@ -246,23 +290,25 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_id": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         }
     },
-    "tags": [
-        {
-            "description": "Payment management endpoints",
-            "name": "payments"
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Enter your JWT token with the Bearer prefix.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
-    ]
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8084",
+	Host:             "localhost:8083",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Payment Service API",

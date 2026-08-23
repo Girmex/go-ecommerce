@@ -10,17 +10,16 @@ import (
 type Config struct {
 	HTTPPort     string
 	DatabaseURL  string
+	JWTSecret    string
 }
 
 func Load() *Config {
 	_ = godotenv.Load()
 
 	cfg := &Config{
-		HTTPPort:    getEnv("HTTP_PORT", "8084"),
-		DatabaseURL: getEnv(
-			"DATABASE_URL",
-			"postgres://postgres:postgres@localhost:5434/payment_db",
-		),
+		HTTPPort:    os.Getenv("HTTP_PORT"),
+		DatabaseURL: os.Getenv("DATABASE_URL"),
+		JWTSecret: os.Getenv("JWT_SECRET"),
 	}
 
 	return cfg

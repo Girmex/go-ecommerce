@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS payments (
     id UUID PRIMARY KEY,
     order_id VARCHAR(255) NOT NULL,
-    user_id VARCHAR(255) NOT NULL,
+    user_id BIGINT NOT NULL,
     amount NUMERIC(12, 2) NOT NULL,
     method VARCHAR(50) NOT NULL,
     status VARCHAR(30) NOT NULL,

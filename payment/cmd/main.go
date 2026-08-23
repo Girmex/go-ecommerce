@@ -22,8 +22,13 @@ import (
 // @title           Payment Service API
 // @version         1.0
 // @description     Payment microservice for the eCommerce application.
-// @host            localhost:8084
+// @host            localhost:8083
 // @BasePath        /
+//
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Enter your JWT token with the Bearer prefix.
 //
 // @tag.name payments
 // @tag.description Payment management endpoints
@@ -47,6 +52,13 @@ func main() {
 
 	if err := dbPool.Ping(ctx); err != nil {
 		log.Fatalf("failed to ping database: %v", err)
+	}
+
+	if err := database.RunMigrations(
+		cfg.DatabaseURL,
+		"migrations",
+	); err != nil {
+		log.Fatalf("failed to run migrations: %v", err)
 	}
 
 	// ------------------------------------------------------------
@@ -82,6 +94,7 @@ func main() {
 
 	router := httpadapter.NewRouter(
 		paymentHandler,
+		cfg.JWTSecret,
 	)
 
 	// ------------------------------------------------------------

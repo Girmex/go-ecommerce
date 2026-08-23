@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
 
+	"github.com/Girmex/go-ecommerce-app/chi-microservice/payment/internal/adapter/http/middleware"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/payment/internal/domain"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/payment/internal/port"
 )
@@ -33,8 +34,10 @@ func NewPaymentHandler(
 // @Accept       json
 // @Produce      json
 // @Param        payment  body      ChargeRequest  true  "Charge payload"
+// @Security     BearerAuth
 // @Success      201      {object}  PaymentResponse
 // @Failure      400      {object}  ErrorResponse
+// @Failure      401      {object}  ErrorResponse
 // @Failure      402      {object}  ErrorResponse
 // @Failure      500      {object}  ErrorResponse
 // @Router       /payments [post]
@@ -42,6 +45,17 @@ func (h *PaymentHandler) Charge(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
+	userID, ok := middleware.UserID(r.Context())
+	if !ok {
+		writeError(
+			w,
+			http.StatusUnauthorized,
+			"UNAUTHORIZED",
+			"authenticated user not found",
+		)
+		return
+	}
+
 	var req ChargeRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -68,7 +82,7 @@ func (h *PaymentHandler) Charge(
 		r.Context(),
 		port.ChargeInput{
 			OrderID: req.OrderID,
-			UserID:  req.UserID,
+			UserID:  userID,
 			Amount:  req.Amount,
 			Method:  req.Method,
 		},
@@ -106,7 +120,9 @@ func (h *PaymentHandler) Charge(
 // @Tags         payments
 // @Produce      json
 // @Param        id  path  string  true  "Payment ID"
+// @Security     BearerAuth
 // @Success      200  {object} PaymentResponse
+// @Failure      401  {object} ErrorResponse
 // @Failure      404  {object} ErrorResponse
 // @Failure      500  {object} ErrorResponse
 // @Router       /payments/{id} [get]
@@ -114,6 +130,17 @@ func (h *PaymentHandler) Get(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
+	userID, ok := middleware.UserID(r.Context())
+	if !ok {
+		writeError(
+			w,
+			http.StatusUnauthorized,
+			"UNAUTHORIZED",
+			"authenticated user not found",
+		)
+		return
+	}
+
 	id := chi.URLParam(r, "id")
 
 	payment, err := h.paymentService.Get(
@@ -141,6 +168,16 @@ func (h *PaymentHandler) Get(
 		return
 	}
 
+	if payment.UserID != userID {
+		writeError(
+			w,
+			http.StatusNotFound,
+			"PAYMENT_NOT_FOUND",
+			"payment not found",
+		)
+		return
+	}
+
 	writeJSON(
 		w,
 		http.StatusOK,
@@ -149,33 +186,49 @@ func (h *PaymentHandler) Get(
 }
 
 // List godoc
-// @Summary      List payments
+// @Summary      List authenticated user's payments
 // @Tags         payments
 // @Produce      json
+// @Security     BearerAuth
 // @Success      200  {array} PaymentResponse
+// @Failure      401  {object} ErrorResponse
 // @Failure      500  {object} ErrorResponse
 // @Router       /payments [get]
 func (h *PaymentHandler) List(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
+	userID, ok := middleware.UserID(r.Context())
+	if !ok {
+		writeError(
+			w,
+			http.StatusUnauthorized,
+			"UNAUTHORIZED",
+			"authenticated user not found",
+		)
+		return
+	}
+
 	payments, err := h.paymentService.List(
 		r.Context(),
 	)
-
 	if err != nil {
 		writeError(
 			w,
 			http.StatusInternalServerError,
 			"INTERNAL_ERROR",
-			"an internal server error occurred",
+			err.Error(),
 		)
 		return
 	}
 
-	out := make([]PaymentResponse, 0, len(payments))
+	out := make([]PaymentResponse, 0)
 
 	for _, payment := range payments {
+		if payment.UserID != userID {
+			continue
+		}
+
 		out = append(
 			out,
 			toPaymentResponse(payment),
@@ -194,7 +247,9 @@ func (h *PaymentHandler) List(
 // @Tags         payments
 // @Produce      json
 // @Param        id  path  string  true  "Payment ID"
+// @Security     BearerAuth
 // @Success      200  {object} PaymentResponse
+// @Failure      401  {object} ErrorResponse
 // @Failure      404  {object} ErrorResponse
 // @Failure      500  {object} ErrorResponse
 // @Router       /payments/{id}/refund [post]
@@ -202,9 +257,55 @@ func (h *PaymentHandler) Refund(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
+	userID, ok := middleware.UserID(r.Context())
+	if !ok {
+		writeError(
+			w,
+			http.StatusUnauthorized,
+			"UNAUTHORIZED",
+			"authenticated user not found",
+		)
+		return
+	}
+
 	id := chi.URLParam(r, "id")
 
-	payment, err := h.paymentService.Refund(
+	payment, err := h.paymentService.Get(
+		r.Context(),
+		id,
+	)
+
+	if err != nil {
+		if errors.Is(err, domain.ErrPaymentNotFound) {
+			writeError(
+				w,
+				http.StatusNotFound,
+				"PAYMENT_NOT_FOUND",
+				"payment not found",
+			)
+			return
+		}
+
+		writeError(
+			w,
+			http.StatusInternalServerError,
+			"INTERNAL_ERROR",
+			"an internal server error occurred",
+		)
+		return
+	}
+
+	if payment.UserID != userID {
+		writeError(
+			w,
+			http.StatusNotFound,
+			"PAYMENT_NOT_FOUND",
+			"payment not found",
+		)
+		return
+	}
+
+	payment, err = h.paymentService.Refund(
 		r.Context(),
 		id,
 	)
