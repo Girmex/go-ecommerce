@@ -75,11 +75,26 @@ func (c *Client) do(
 	req *http.Request,
 	result any,
 ) error {
+	fmt.Printf(
+		"HTTP REQUEST: %s %s\n",
+		req.Method,
+		req.URL.String(),
+	)
+
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
+		fmt.Printf("HTTP ERROR: %v\n", err)
+
 		return fmt.Errorf("http request: %w", err)
 	}
+
 	defer resp.Body.Close()
+
+	fmt.Printf(
+		"HTTP RESPONSE: %d %s\n",
+		resp.StatusCode,
+		resp.Status,
+	)
 
 	if resp.StatusCode < http.StatusOK ||
 		resp.StatusCode >= http.StatusMultipleChoices {

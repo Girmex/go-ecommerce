@@ -17,22 +17,18 @@ const docTemplate = `{
     "paths": {
         "/orders": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "orders"
                 ],
-                "summary": "List a user's orders",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "user_id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
+                "summary": "List authenticated user's orders",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -43,8 +39,8 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/http.ErrorResponse"
                         }
@@ -58,6 +54,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates an order and reserves stock for each product.",
                 "consumes": [
                     "application/json"
@@ -93,6 +94,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/http.ErrorResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
@@ -110,6 +117,11 @@ const docTemplate = `{
         },
         "/orders/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -133,6 +145,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/http.OrderResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
@@ -150,6 +168,11 @@ const docTemplate = `{
         },
         "/orders/{id}/cancel": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -171,6 +194,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/http.OrderResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
                         }
                     },
                     "404": {
@@ -211,8 +240,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "items",
-                "payment_method",
-                "user_id"
+                "payment_method"
             ],
             "properties": {
                 "items": {
@@ -230,9 +258,6 @@ const docTemplate = `{
                         "bank_transfer"
                     ],
                     "example": "card"
-                },
-                "user_id": {
-                    "type": "string"
                 }
             }
         },
@@ -293,17 +318,19 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_id": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         }
     },
-    "tags": [
-        {
-            "description": "Order management endpoints",
-            "name": "orders"
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Enter your JWT token with the Bearer prefix.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
-    ]
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it

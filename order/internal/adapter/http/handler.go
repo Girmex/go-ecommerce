@@ -3,8 +3,10 @@ package http
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 
+	"github.com/Girmex/go-ecommerce-app/chi-microservice/order/internal/adapter/http/middleware"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/order/internal/domain"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/order/internal/port"
 	"github.com/go-chi/chi/v5"
@@ -23,15 +25,16 @@ func NewOrderHandler(orderService port.OrderService) *OrderHandler {
 	}
 }
 
-// Create godoc
 // @Summary      Place an order
 // @Description  Creates an order and reserves stock for each product.
 // @Tags         orders
 // @Accept       json
 // @Produce      json
+// @Security     BearerAuth
 // @Param        order  body      CreateOrderRequest  true  "Order payload"
 // @Success      201    {object}  OrderResponse
 // @Failure      400    {object}  ErrorResponse
+// @Failure      401    {object}  ErrorResponse
 // @Failure      404    {object}  ErrorResponse
 // @Failure      500    {object}  ErrorResponse
 // @Router       /orders [post]
@@ -68,11 +71,22 @@ func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 			Quantity:  item.Quantity,
 		})
 	}
+	userID, ok := middleware.UserID(r.Context())
+	if !ok {
+		writeError(
+			w,
+			http.StatusUnauthorized,
+			"UNAUTHORIZED",
+			"authenticated user not found",
+			nil,
+		)
+		return
+	}
 
 	order, err := h.orderService.PlaceOrder(
 		r.Context(),
 		port.CreateOrderInput{
-			UserID:        req.UserID,
+			UserID:        userID,
 			Items:         items,
 			PaymentMethod: req.PaymentMethod,
 		},
@@ -112,7 +126,7 @@ func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 				w,
 				http.StatusInternalServerError,
 				"INTERNAL_ERROR",
-				"an internal server error occurred",
+				err.Error(),
 				nil,
 			)
 		}
@@ -132,18 +146,31 @@ func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Tags         orders
 // @Produce      json
 // @Param        id   path      string  true  "Order ID"
+// @Security     BearerAuth
 // @Success      200  {object}  OrderResponse
+// @Failure      401  {object}  ErrorResponse
 // @Failure      404  {object}  ErrorResponse
 // @Failure      500  {object}  ErrorResponse
 // @Router       /orders/{id} [get]
 func (h *OrderHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
+	userID, ok := middleware.UserID(r.Context())
+	if !ok {
+		writeError(
+			w,
+			http.StatusUnauthorized,
+			"UNAUTHORIZED",
+			"authenticated user not found",
+			nil,
+		)
+		return
+	}
+
 	order, err := h.orderService.Get(
 		r.Context(),
 		id,
 	)
-
 	if err != nil {
 		if errors.Is(err, domain.ErrOrderNotFound) {
 			writeError(
@@ -166,6 +193,17 @@ func (h *OrderHandler) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if order.UserID != userID {
+		writeError(
+			w,
+			http.StatusNotFound,
+			"ORDER_NOT_FOUND",
+			"order not found",
+			nil,
+		)
+		return
+	}
+
 	writeJSON(
 		w,
 		http.StatusOK,
@@ -174,23 +212,22 @@ func (h *OrderHandler) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 // ListByUser godoc
-// @Summary      List a user's orders
+// @Summary      List authenticated user's orders
 // @Tags         orders
 // @Produce      json
-// @Param        user_id  query  string  true  "User ID"
+// @Security     BearerAuth
 // @Success      200  {array}   OrderResponse
-// @Failure      400  {object}  ErrorResponse
+// @Failure      401  {object}  ErrorResponse
 // @Failure      500  {object}  ErrorResponse
 // @Router       /orders [get]
 func (h *OrderHandler) ListByUser(w http.ResponseWriter, r *http.Request) {
-	userID := r.URL.Query().Get("user_id")
-
-	if userID == "" {
+	userID, ok := middleware.UserID(r.Context())
+	if !ok {
 		writeError(
 			w,
-			http.StatusBadRequest,
-			"MISSING_USER_ID",
-			"user_id query parameter is required",
+			http.StatusUnauthorized,
+			"UNAUTHORIZED",
+			"authenticated user not found",
 			nil,
 		)
 		return
@@ -202,11 +239,13 @@ func (h *OrderHandler) ListByUser(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
+		log.Printf("ListByUser error: %v", err)
+
 		writeError(
 			w,
 			http.StatusInternalServerError,
 			"INTERNAL_ERROR",
-			"an internal server error occurred",
+			err.Error(),
 			nil,
 		)
 		return
@@ -233,14 +272,65 @@ func (h *OrderHandler) ListByUser(w http.ResponseWriter, r *http.Request) {
 // @Tags         orders
 // @Produce      json
 // @Param        id   path      string  true  "Order ID"
+// @Security     BearerAuth
 // @Success      200  {object}  OrderResponse
+// @Failure      401  {object}  ErrorResponse
 // @Failure      404  {object}  ErrorResponse
 // @Failure      500  {object}  ErrorResponse
 // @Router       /orders/{id}/cancel [post]
 func (h *OrderHandler) Cancel(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
-	order, err := h.orderService.Cancel(
+	userID, ok := middleware.UserID(r.Context())
+	if !ok {
+		writeError(
+			w,
+			http.StatusUnauthorized,
+			"UNAUTHORIZED",
+			"authenticated user not found",
+			nil,
+		)
+		return
+	}
+
+	order, err := h.orderService.Get(
+		r.Context(),
+		id,
+	)
+	if err != nil {
+		if errors.Is(err, domain.ErrOrderNotFound) {
+			writeError(
+				w,
+				http.StatusNotFound,
+				"ORDER_NOT_FOUND",
+				err.Error(),
+				nil,
+			)
+			return
+		}
+
+		writeError(
+			w,
+			http.StatusInternalServerError,
+			"INTERNAL_ERROR",
+			"an internal server error occurred",
+			nil,
+		)
+		return
+	}
+
+	if order.UserID != userID {
+		writeError(
+			w,
+			http.StatusNotFound,
+			"ORDER_NOT_FOUND",
+			"order not found",
+			nil,
+		)
+		return
+	}
+
+	order, err = h.orderService.Cancel(
 		r.Context(),
 		id,
 	)

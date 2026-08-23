@@ -29,6 +29,12 @@ func (c *ProductHTTPClient) GetProduct(
 	productID string,
 ) (*port.ProductInfo, error) {
 
+	fmt.Printf(
+		"calling Product-MS: %s/products/%s\n",
+		c.c.baseURL,
+		productID,
+	)
+
 	var dto productDTO
 
 	if err := c.c.Get(
@@ -36,7 +42,11 @@ func (c *ProductHTTPClient) GetProduct(
 		"/products/"+productID,
 		&dto,
 	); err != nil {
-		return nil, fmt.Errorf("product-ms: %w", err)
+		return nil, fmt.Errorf(
+			"product-ms GetProduct(%s): %w",
+			productID,
+			err,
+		)
 	}
 
 	return &port.ProductInfo{

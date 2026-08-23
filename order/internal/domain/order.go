@@ -33,7 +33,7 @@ func (i OrderItem) Subtotal() float64 {
 
 type Order struct {
 	ID        string      `json:"id"`
-	UserID    string      `json:"user_id"`
+	UserID    uint        `json:"user_id"`
 	Items     []OrderItem `json:"items"`
 	Total     float64     `json:"total"`
 	Status    OrderStatus `json:"status"`

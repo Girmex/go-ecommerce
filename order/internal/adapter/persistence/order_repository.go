@@ -29,7 +29,6 @@ func (r *OrderRepository) Create(
 	}
 	defer tx.Rollback(ctx)
 
-	// Create order
 	_, err = tx.Exec(
 		ctx,
 		`
@@ -56,7 +55,6 @@ func (r *OrderRepository) Create(
 		return err
 	}
 
-	// Create order items
 	for _, item := range order.Items {
 		_, err = tx.Exec(
 			ctx,
@@ -88,6 +86,8 @@ func (r *OrderRepository) GetByID(
 ) (*domain.Order, error) {
 	order := &domain.Order{}
 
+	var paymentID *string
+
 	err := r.db.QueryRow(
 		ctx,
 		`
@@ -108,7 +108,7 @@ func (r *OrderRepository) GetByID(
 		&order.UserID,
 		&order.Total,
 		&order.Status,
-		&order.PaymentID,
+		&paymentID,
 		&order.CreatedAt,
 		&order.UpdatedAt,
 	)
@@ -119,6 +119,10 @@ func (r *OrderRepository) GetByID(
 		}
 
 		return nil, err
+	}
+
+	if paymentID != nil {
+		order.PaymentID = *paymentID
 	}
 
 	items, err := r.getItems(ctx, order.ID)
@@ -133,7 +137,7 @@ func (r *OrderRepository) GetByID(
 
 func (r *OrderRepository) ListByUser(
 	ctx context.Context,
-	userID string,
+	userID uint,
 ) ([]*domain.Order, error) {
 	rows, err := r.db.Query(
 		ctx,
@@ -162,17 +166,23 @@ func (r *OrderRepository) ListByUser(
 	for rows.Next() {
 		order := &domain.Order{}
 
+		var paymentID *string
+
 		err := rows.Scan(
 			&order.ID,
 			&order.UserID,
 			&order.Total,
 			&order.Status,
-			&order.PaymentID,
+			&paymentID,
 			&order.CreatedAt,
 			&order.UpdatedAt,
 		)
 		if err != nil {
 			return nil, err
+		}
+
+		if paymentID != nil {
+			order.PaymentID = *paymentID
 		}
 
 		items, err := r.getItems(ctx, order.ID)
@@ -227,7 +237,6 @@ func (r *OrderRepository) Update(
 		return domain.ErrOrderNotFound
 	}
 
-	// Replace existing items.
 	_, err = tx.Exec(
 		ctx,
 		`

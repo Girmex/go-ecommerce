@@ -8,7 +8,6 @@ type CreateOrderItemRequest struct {
 }
 
 type CreateOrderRequest struct {
-	UserID        string                    `json:"user_id" validate:"required,uuid"`
 	Items         []CreateOrderItemRequest  `json:"items" validate:"required,min=1,dive"`
 	PaymentMethod string                    `json:"payment_method" validate:"required,oneof=card wallet bank_transfer" example:"card"`
 }
@@ -22,7 +21,7 @@ type OrderItemResponse struct {
 
 type OrderResponse struct {
 	ID        string              `json:"id"`
-	UserID    string              `json:"user_id"`
+	UserID    uint                `json:"user_id"`
 	Items     []OrderItemResponse `json:"items"`
 	Total     float64             `json:"total"`
 	Status    string              `json:"status"`

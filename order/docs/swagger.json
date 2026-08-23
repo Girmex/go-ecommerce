@@ -11,22 +11,18 @@
     "paths": {
         "/orders": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "orders"
                 ],
-                "summary": "List a user's orders",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "user_id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
+                "summary": "List authenticated user's orders",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -37,8 +33,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/http.ErrorResponse"
                         }
@@ -52,6 +48,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates an order and reserves stock for each product.",
                 "consumes": [
                     "application/json"
@@ -87,6 +88,12 @@
                             "$ref": "#/definitions/http.ErrorResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
@@ -104,6 +111,11 @@
         },
         "/orders/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -127,6 +139,12 @@
                             "$ref": "#/definitions/http.OrderResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
@@ -144,6 +162,11 @@
         },
         "/orders/{id}/cancel": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -165,6 +188,12 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/http.OrderResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
                         }
                     },
                     "404": {
@@ -205,8 +234,7 @@
             "type": "object",
             "required": [
                 "items",
-                "payment_method",
-                "user_id"
+                "payment_method"
             ],
             "properties": {
                 "items": {
@@ -224,9 +252,6 @@
                         "bank_transfer"
                     ],
                     "example": "card"
-                },
-                "user_id": {
-                    "type": "string"
                 }
             }
         },
@@ -287,15 +312,17 @@
                     "type": "string"
                 },
                 "user_id": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         }
     },
-    "tags": [
-        {
-            "description": "Order management endpoints",
-            "name": "orders"
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Enter your JWT token with the Bearer prefix.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
-    ]
+    }
 }

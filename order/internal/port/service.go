@@ -12,7 +12,7 @@ type CreateOrderItemInput struct {
 }
 
 type CreateOrderInput struct {
-	UserID        string
+	UserID        uint
 	Items         []CreateOrderItemInput
 	PaymentMethod string
 }
@@ -20,6 +20,6 @@ type CreateOrderInput struct {
 type OrderService interface {
 	PlaceOrder(ctx context.Context, in CreateOrderInput) (*domain.Order, error)
 	Get(ctx context.Context, id string) (*domain.Order, error)
-	ListByUser(ctx context.Context, userID string) ([]*domain.Order, error)
+	ListByUser(ctx context.Context, userID uint) ([]*domain.Order, error)
 	Cancel(ctx context.Context, id string) (*domain.Order, error)
 }

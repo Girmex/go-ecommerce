@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS orders (
     id UUID PRIMARY KEY,
-    user_id UUID NOT NULL,
+    user_id BIGINT NOT NULL,
     total NUMERIC(12, 2) NOT NULL DEFAULT 0,
     status VARCHAR(50) NOT NULL,
     payment_id UUID,

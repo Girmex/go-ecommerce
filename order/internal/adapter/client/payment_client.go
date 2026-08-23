@@ -25,7 +25,7 @@ type paymentDTO struct {
 func (c *PaymentHTTPClient) Charge(
 	ctx context.Context,
 	orderID string,
-	userID string,
+	userID uint,
 	amount float64,
 	method string,
 ) (*port.PaymentResult, error) {

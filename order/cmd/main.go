@@ -23,6 +23,11 @@ import (
 // @host            localhost:8082
 // @BasePath        /
 //
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Enter your JWT token with the Bearer prefix.
+//
 // @tag.name orders
 // @tag.description Order management endpoints
 func main() {
@@ -30,61 +35,48 @@ func main() {
 
 	ctx := context.Background()
 
-	// ------------------------------------------------------------
-	// Database
-	// ------------------------------------------------------------
-
 	dbPool, err := database.NewPostgresPool(
 		ctx,
 		cfg.DatabaseURL,
 	)
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		log.Fatal(err)
 	}
 	defer dbPool.Close()
 
 	if err := dbPool.Ping(ctx); err != nil {
-		log.Fatalf("failed to ping database: %v", err)
+		log.Fatal(err)
 	}
 
-	// ------------------------------------------------------------
-	// Clients
-	// ------------------------------------------------------------
+	if err := database.RunMigrations(
+		cfg.DatabaseURL,
+		"migrations",
+	); err != nil {
+		log.Fatal(err)
+	}
 
-	userClient := client.NewUserHTTPClient(
-		"http://localhost:8083",
+	log.Printf(
+		"Product service URL: %q",
+		cfg.ProductServiceURL,
 	)
 
 	productClient := client.NewProductHTTPClient(
-		"http://localhost:8081",
+		cfg.ProductServiceURL,
 	)
 
 	paymentClient := client.NewPaymentHTTPClient(
-		"http://localhost:8084",
+		cfg.PaymentServiceURL,
 	)
-
-	// ------------------------------------------------------------
-	// Persistence
-	// ------------------------------------------------------------
 
 	orderRepository := persistence.NewOrderRepository(
 		dbPool,
 	)
 
-	// ------------------------------------------------------------
-	// Application
-	// ------------------------------------------------------------
-
 	orderService := application.NewOrderService(
 		orderRepository,
-		userClient,
 		productClient,
 		paymentClient,
 	)
-
-	// ------------------------------------------------------------
-	// HTTP
-	// ------------------------------------------------------------
 
 	orderHandler := httpadapter.NewOrderHandler(
 		orderService,
@@ -92,11 +84,8 @@ func main() {
 
 	router := httpadapter.NewRouter(
 		orderHandler,
+		cfg.JWTSecret,
 	)
-
-	// ------------------------------------------------------------
-	// HTTP Server
-	// ------------------------------------------------------------
 
 	server := &nethttp.Server{
 		Addr:              ":" + cfg.HTTPPort,
@@ -118,10 +107,6 @@ func main() {
 			)
 		}
 	}()
-
-	// ------------------------------------------------------------
-	// Graceful shutdown
-	// ------------------------------------------------------------
 
 	stop := make(chan os.Signal, 1)
 

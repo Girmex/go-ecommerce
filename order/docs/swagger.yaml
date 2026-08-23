@@ -26,12 +26,9 @@ definitions:
         - bank_transfer
         example: card
         type: string
-      user_id:
-        type: string
     required:
     - items
     - payment_method
-    - user_id
     type: object
   http.ErrorResponse:
     properties:
@@ -71,7 +68,7 @@ definitions:
       updated_at:
         type: string
       user_id:
-        type: string
+        type: integer
     type: object
 host: localhost:8082
 info:
@@ -82,12 +79,6 @@ info:
 paths:
   /orders:
     get:
-      parameters:
-      - description: User ID
-        in: query
-        name: user_id
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -97,15 +88,17 @@ paths:
             items:
               $ref: '#/definitions/http.OrderResponse'
             type: array
-        "400":
-          description: Bad Request
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/http.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/http.ErrorResponse'
-      summary: List a user's orders
+      security:
+      - BearerAuth: []
+      summary: List authenticated user's orders
       tags:
       - orders
     post:
@@ -130,6 +123,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
         "404":
           description: Not Found
           schema:
@@ -138,6 +135,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Place an order
       tags:
       - orders
@@ -156,6 +155,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/http.OrderResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
         "404":
           description: Not Found
           schema:
@@ -164,6 +167,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Get an order by ID
       tags:
       - orders
@@ -182,6 +187,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/http.OrderResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
         "404":
           description: Not Found
           schema:
@@ -190,10 +199,15 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Cancel an order
       tags:
       - orders
+securityDefinitions:
+  BearerAuth:
+    description: Enter your JWT token with the Bearer prefix.
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
-tags:
-- description: Order management endpoints
-  name: orders
