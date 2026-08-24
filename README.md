@@ -38,49 +38,6 @@ Each service has its own:
 - Swagger documentation
 - Configuration
 
-Each service can be run independently from its own directory.]633;E;echo "";2cb93968-fbf9-4130-814b-34c329917fe8]633;C
-## Swagger Testing
-
-### password-validation
-
-
-### login-response
-
-
-### list-products
-
-
-### get-product
-
-
-### post-product
-
-
-### place-order
-
-
-### get-order
-
-
-### cancel-order
-
-
-### charge-payment
-
-
-### get-payment
-
-
-### list-payment
-
-
-### refund-payment
-
-
-### protected-endpoint
-
-
-]633;E;echo "";2cb93968-fbf9-4130-814b-34c329917fe8]633;C
 ## Swagger Testing
 
 ### password-validation
