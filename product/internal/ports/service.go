@@ -1,5 +1,3 @@
-
-
 package ports
 
 import (
@@ -9,6 +7,7 @@ import (
 )
 
 type CreateProductInput struct {
+	UserID      uint
 	Name        string
 	Description string
 	Price       float64
@@ -16,6 +15,7 @@ type CreateProductInput struct {
 }
 
 type UpdateProductInput struct {
+	UserID      uint
 	Name        string
 	Description string
 	Price       float64
@@ -27,6 +27,6 @@ type ProductService interface {
 	Get(ctx context.Context, id string) (*domain.Product, error)
 	List(ctx context.Context) ([]*domain.Product, error)
 	Update(ctx context.Context, id string, in UpdateProductInput) (*domain.Product, error)
-	Delete(ctx context.Context, id string) error
+	Delete(ctx context.Context, id string, userID uint) error
 	ReserveStock(ctx context.Context, id string, qty int) (*domain.Product, error)
 }

@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/adapters/auth"
-	httpadapter "github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/adapters/http"
-	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/adapters/persistence"
+	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/adapter/auth"
+	httpahandler "github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/adapter/http"
+	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/adapter/persistence"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/application"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/config"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/database"
@@ -53,8 +53,8 @@ func main() {
 		tokenService,
 	)
 
-	handler := httpadapter.NewHandler(userService)
-	router := httpadapter.NewRouter(handler, tokenService)
+	handler := httpahandler.NewHandler(userService)
+	router := httpahandler.NewRouter(handler, tokenService)
 
 	log.Printf("user service listening on :%s", cfg.HTTPPort)
 

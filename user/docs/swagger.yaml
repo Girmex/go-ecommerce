@@ -1,14 +1,17 @@
 basePath: /
 definitions:
-  dto.CreateUserRequest:
+  http.CreateUserRequest:
     properties:
       email:
+        example: test@example.com
         type: string
       name:
+        example: Test User
         maxLength: 100
         minLength: 2
         type: string
       password:
+        example: testpwd123
         minLength: 8
         type: string
     required:
@@ -16,35 +19,44 @@ definitions:
     - name
     - password
     type: object
-  dto.LoginRequest:
+  http.LoginRequest:
     properties:
       email:
+        example: test@example.com
         type: string
       password:
+        example: testpwd123
         minLength: 8
         type: string
     required:
     - email
     - password
     type: object
-  dto.LoginResponse:
+  http.LoginResponse:
     properties:
       email:
+        example: test@example.com
         type: string
       id:
+        example: 1
         type: integer
       name:
+        example: Test User
         type: string
       token:
+        example: eyJhbGciOiJIUzI1NiIs...
         type: string
     type: object
-  dto.UserResponse:
+  http.UserResponse:
     properties:
       email:
+        example: test@example.com
         type: string
       id:
+        example: 1
         type: integer
       name:
+        example: Test User
         type: string
     type: object
 host: localhost:8080
@@ -65,14 +77,14 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/dto.CreateUserRequest'
+          $ref: '#/definitions/http.CreateUserRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/dto.UserResponse'
+            $ref: '#/definitions/http.UserResponse'
         "400":
           description: Bad Request
           schema:
@@ -105,14 +117,14 @@ paths:
         name: credentials
         required: true
         schema:
-          $ref: '#/definitions/dto.LoginRequest'
+          $ref: '#/definitions/http.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.LoginResponse'
+            $ref: '#/definitions/http.LoginResponse'
         "400":
           description: Bad Request
           schema:
@@ -143,7 +155,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.UserResponse'
+            $ref: '#/definitions/http.UserResponse'
         "401":
           description: Unauthorized
           schema:

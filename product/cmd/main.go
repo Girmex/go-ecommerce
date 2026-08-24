@@ -18,12 +18,20 @@ import (
 // @description Product microservice for the eCommerce application.
 // @host localhost:8081
 // @BasePath /
+//
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Enter your JWT token with the Bearer prefix.
 func main() {
 	cfg := config.Load()
 
 	ctx := context.Background()
 
-	db, err := database.NewPostgresPool(ctx, cfg.DatabaseURL)
+	db, err := database.NewPostgresPool(
+		ctx,
+		cfg.DatabaseURL,
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -52,9 +60,15 @@ func main() {
 	handler := httpHandler.NewHandler(productService)
 
 	// HTTP router
-	router := routers.NewRouter(handler)
+	router := routers.NewRouter(
+		handler,
+		cfg.JwtSecret,
+	)
 
-	log.Printf("product service listening on :%s", cfg.HTTPPort)
+	log.Printf(
+		"product service listening on :%s",
+		cfg.HTTPPort,
+	)
 
 	if err := http.ListenAndServe(
 		":"+cfg.HTTPPort,

@@ -18,10 +18,15 @@ func NewProductService(repo port.ProductRepository) port.ProductService {
 	return &ProductService{repo: repo}
 }
 
-func (s *ProductService) Create(ctx context.Context, in port.CreateProductInput) (*domain.Product, error) {
+func (s *ProductService) Create(
+	ctx context.Context,
+	in port.CreateProductInput,
+) (*domain.Product, error) {
 	now := time.Now().UTC()
+
 	p := &domain.Product{
 		ID:          uuid.NewString(),
+		UserID:      in.UserID,
 		Name:        in.Name,
 		Description: in.Description,
 		Price:       in.Price,
@@ -29,60 +34,106 @@ func (s *ProductService) Create(ctx context.Context, in port.CreateProductInput)
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
+
 	if err := s.repo.Create(ctx, p); err != nil {
 		return nil, err
 	}
+
 	return p, nil
 }
 
-func (s *ProductService) Get(ctx context.Context, id string) (*domain.Product, error) {
+func (s *ProductService) Get(
+	ctx context.Context,
+	id string,
+) (*domain.Product, error) {
 	return s.repo.GetByID(ctx, id)
 }
 
-func (s *ProductService) List(ctx context.Context) ([]*domain.Product, error) {
+func (s *ProductService) List(
+	ctx context.Context,
+) ([]*domain.Product, error) {
 	return s.repo.List(ctx)
 }
 
-func (s *ProductService) Update(ctx context.Context, id string, in port.UpdateProductInput) (*domain.Product, error) {
+func (s *ProductService) Update(
+	ctx context.Context,
+	id string,
+	in port.UpdateProductInput,
+) (*domain.Product, error) {
 	p, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
+
+	// Authorization: the authenticated user must own the product.
+	if p.UserID != in.UserID {
+		return nil, domain.ErrProductNotFound
+	}
+
 	if in.Name != "" {
 		p.Name = in.Name
 	}
+
 	if in.Description != "" {
 		p.Description = in.Description
 	}
+
 	if in.Price > 0 {
 		p.Price = in.Price
 	}
+
 	if in.Stock != nil {
 		p.Stock = *in.Stock
 	}
+
 	p.UpdatedAt = time.Now().UTC()
 
-	if err := s.repo.Update(ctx, p); err != nil {
+	if err := s.repo.Update(ctx, p, in.UserID); err != nil {
 		return nil, err
 	}
+
 	return p, nil
 }
 
-func (s *ProductService) Delete(ctx context.Context, id string) error {
-	return s.repo.Delete(ctx, id)
+func (s *ProductService) Delete(
+	ctx context.Context,
+	id string,
+	userID uint,
+) error {
+	p, err := s.repo.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	// Authorization: only the product owner can delete it.
+	if p.UserID != userID {
+		return domain.ErrProductNotFound
+	}
+
+	return s.repo.Delete(ctx, id, userID)
 }
 
-func (s *ProductService) ReserveStock(ctx context.Context, id string, qty int) (*domain.Product, error) {
+func (s *ProductService) ReserveStock(
+	ctx context.Context,
+	id string,
+	qty int,
+) (*domain.Product, error) {
 	p, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
+
 	if err := p.ReserveStock(qty); err != nil {
 		return nil, err
 	}
+
 	p.UpdatedAt = time.Now().UTC()
-	if err := s.repo.Update(ctx, p); err != nil {
+
+	// ReserveStock is an internal operation, so it does not
+	// perform user ownership authorization.
+	if err := s.repo.Update(ctx, p, p.UserID); err != nil {
 		return nil, err
 	}
+
 	return p, nil
 }

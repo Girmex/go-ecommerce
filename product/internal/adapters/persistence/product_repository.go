@@ -26,6 +26,7 @@ func (r *ProductRepository) Create(
 	query := `
 		INSERT INTO products (
 			id,
+			user_id,
 			name,
 			description,
 			price,
@@ -33,13 +34,14 @@ func (r *ProductRepository) Create(
 			created_at,
 			updated_at
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 	`
 
 	_, err := r.db.Exec(
 		ctx,
 		query,
 		product.ID,
+		product.UserID,
 		product.Name,
 		product.Description,
 		product.Price,
@@ -58,6 +60,7 @@ func (r *ProductRepository) GetByID(
 	query := `
 		SELECT
 			id,
+			user_id,
 			name,
 			description,
 			price,
@@ -72,6 +75,7 @@ func (r *ProductRepository) GetByID(
 
 	err := r.db.QueryRow(ctx, query, id).Scan(
 		&product.ID,
+		&product.UserID,
 		&product.Name,
 		&product.Description,
 		&product.Price,
@@ -97,6 +101,7 @@ func (r *ProductRepository) List(
 	query := `
 		SELECT
 			id,
+			user_id,
 			name,
 			description,
 			price,
@@ -120,6 +125,7 @@ func (r *ProductRepository) List(
 
 		if err := rows.Scan(
 			&product.ID,
+			&product.UserID,
 			&product.Name,
 			&product.Description,
 			&product.Price,
@@ -143,6 +149,7 @@ func (r *ProductRepository) List(
 func (r *ProductRepository) Update(
 	ctx context.Context,
 	product *domain.Product,
+	userID uint,
 ) error {
 	query := `
 		UPDATE products
@@ -153,6 +160,7 @@ func (r *ProductRepository) Update(
 			stock = $4,
 			updated_at = $5
 		WHERE id = $6
+		AND user_id = $7
 	`
 
 	result, err := r.db.Exec(
@@ -164,6 +172,7 @@ func (r *ProductRepository) Update(
 		product.Stock,
 		product.UpdatedAt,
 		product.ID,
+		userID,
 	)
 
 	if err != nil {
@@ -180,13 +189,21 @@ func (r *ProductRepository) Update(
 func (r *ProductRepository) Delete(
 	ctx context.Context,
 	id string,
+	userID uint,
 ) error {
 	query := `
 		DELETE FROM products
 		WHERE id = $1
+		AND user_id = $2
 	`
 
-	result, err := r.db.Exec(ctx, query, id)
+	result, err := r.db.Exec(
+		ctx,
+		query,
+		id,
+		userID,
+	)
+
 	if err != nil {
 		return err
 	}

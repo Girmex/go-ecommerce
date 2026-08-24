@@ -117,16 +117,23 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Create a product
       tags:
       - products
   /products/{id}:
     delete:
-      description: Deletes a product by its ID.
+      description: Deletes a product by its ID. Only the product owner can delete
+        it.
       parameters:
       - description: Product ID
         in: path
@@ -138,6 +145,10 @@ paths:
       responses:
         "204":
           description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
@@ -146,6 +157,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Delete a product
       tags:
       - products
@@ -178,7 +191,8 @@ paths:
     put:
       consumes:
       - application/json
-      description: Updates an existing product.
+      description: Updates an existing product. Only the product owner can update
+        it.
       parameters:
       - description: Product ID
         in: path
@@ -202,6 +216,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
@@ -210,6 +228,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Update a product
       tags:
       - products
@@ -256,4 +276,10 @@ paths:
       summary: Reserve product stock
       tags:
       - products
+securityDefinitions:
+  BearerAuth:
+    description: Enter your JWT token with the Bearer prefix.
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/ports"
+	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/port"
 )
 
 type contextKey string

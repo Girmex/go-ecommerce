@@ -6,12 +6,13 @@ import (
 )
 
 var (
-	ErrProductNotFound  = errors.New("product not found")
+	ErrProductNotFound   = errors.New("product not found")
 	ErrInsufficientStock = errors.New("insufficient stock")
 )
 
 type Product struct {
 	ID          string    `json:"id"`
+	UserID      uint      `json:"user_id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	Price       float64   `json:"price"`
@@ -25,6 +26,7 @@ func (p *Product) ReserveStock(qty int) error {
 	if p.Stock < qty {
 		return ErrInsufficientStock
 	}
+
 	p.Stock -= qty
 	return nil
 }

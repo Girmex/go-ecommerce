@@ -1,8 +1,8 @@
 package http
 
 import (
-	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/adapters/http/middleware"
-	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/ports"
+	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/adapter/http/middleware"
+	"github.com/Girmex/go-ecommerce-app/chi-microservice/user/internal/port"
 	"github.com/go-chi/chi/v5"
 
 	_ "github.com/Girmex/go-ecommerce-app/chi-microservice/user/docs"

@@ -10,6 +10,7 @@ import (
 type Config struct {
 	DatabaseURL string
 	HTTPPort    string
+	JwtSecret   string
 }
 
 func Load() *Config {
@@ -18,6 +19,7 @@ func Load() *Config {
 	cfg := &Config{
 		DatabaseURL: os.Getenv("DATABASE_URL"),
 		HTTPPort:    os.Getenv("HTTP_PORT"),
+		JwtSecret:   os.Getenv("JWT_SECRET"),
 	}
 
 	if cfg.DatabaseURL == "" {
@@ -26,6 +28,10 @@ func Load() *Config {
 
 	if cfg.HTTPPort == "" {
 		cfg.HTTPPort = "8081"
+	}
+
+	if cfg.JwtSecret == "" {
+		log.Fatal("JWT_SECRET is required")
 	}
 
 	return cfg

@@ -9,6 +9,7 @@ import (
 	"github.com/go-playground/validator/v10"
 
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/adapters/http/dto"
+	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/adapters/http/middleware"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/domain"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/ports"
 )
@@ -32,11 +33,24 @@ func NewHandler(productService ports.ProductService) *Handler {
 // @Accept       json
 // @Produce      json
 // @Param        product  body      dto.CreateProductRequest  true  "Product payload"
+// @Security     BearerAuth
 // @Success      201      {object}  dto.ProductResponse
 // @Failure      400      {object}  dto.ErrorResponse
+// @Failure      401      {object}  dto.ErrorResponse
 // @Failure      500      {object}  dto.ErrorResponse
 // @Router       /products [post]
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
+	userID, ok := middleware.UserID(r.Context())
+	if !ok {
+		writeError(
+			w,
+			http.StatusUnauthorized,
+			"UNAUTHORIZED",
+			"authenticated user not found",
+		)
+		return
+	}
+
 	var req dto.CreateProductRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -62,6 +76,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	product, err := h.productService.Create(
 		r.Context(),
 		ports.CreateProductInput{
+			UserID:      userID,
 			Name:        req.Name,
 			Description: req.Description,
 			Price:       req.Price,
@@ -160,18 +175,31 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 
 // Update godoc
 // @Summary      Update a product
-// @Description  Updates an existing product.
+// @Description  Updates an existing product. Only the product owner can update it.
 // @Tags         products
 // @Accept       json
 // @Produce      json
 // @Param        id       path      string                  true  "Product ID"
 // @Param        product  body      dto.UpdateProductRequest true  "Product fields"
+// @Security     BearerAuth
 // @Success      200      {object}  dto.ProductResponse
 // @Failure      400      {object}  dto.ErrorResponse
+// @Failure      401      {object}  dto.ErrorResponse
 // @Failure      404      {object}  dto.ErrorResponse
 // @Failure      500      {object}  dto.ErrorResponse
 // @Router       /products/{id} [put]
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
+	userID, ok := middleware.UserID(r.Context())
+	if !ok {
+		writeError(
+			w,
+			http.StatusUnauthorized,
+			"UNAUTHORIZED",
+			"authenticated user not found",
+		)
+		return
+	}
+
 	id := chi.URLParam(r, "id")
 
 	var req dto.UpdateProductRequest
@@ -200,6 +228,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 		r.Context(),
 		id,
 		ports.UpdateProductInput{
+			UserID:      userID,
 			Name:        req.Name,
 			Description: req.Description,
 			Price:       req.Price,
@@ -235,18 +264,36 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 
 // Delete godoc
 // @Summary      Delete a product
-// @Description  Deletes a product by its ID.
+// @Description  Deletes a product by its ID. Only the product owner can delete it.
 // @Tags         products
 // @Produce      json
 // @Param        id  path  string  true  "Product ID"
+// @Security     BearerAuth
 // @Success      204  "No Content"
+// @Failure      401  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /products/{id} [delete]
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
+	userID, ok := middleware.UserID(r.Context())
+	if !ok {
+		writeError(
+			w,
+			http.StatusUnauthorized,
+			"UNAUTHORIZED",
+			"authenticated user not found",
+		)
+		return
+	}
+
 	id := chi.URLParam(r, "id")
 
-	err := h.productService.Delete(r.Context(), id)
+	err := h.productService.Delete(
+		r.Context(),
+		id,
+		userID,
+	)
+
 	if err != nil {
 		if errors.Is(err, domain.ErrProductNotFound) {
 			writeError(
