@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  dto.CreateProductRequest:
+  http.CreateProductRequest:
     properties:
       description:
         maxLength: 1000
@@ -22,14 +22,14 @@ definitions:
     - price
     - stock
     type: object
-  dto.ErrorResponse:
+  http.ErrorResponse:
     properties:
       code:
         type: string
       message:
         type: string
     type: object
-  dto.ProductResponse:
+  http.ProductResponse:
     properties:
       created_at:
         type: string
@@ -46,7 +46,7 @@ definitions:
       updated_at:
         type: string
     type: object
-  dto.ReserveStockRequest:
+  http.ReserveStockRequest:
     properties:
       quantity:
         example: 2
@@ -54,7 +54,7 @@ definitions:
     required:
     - quantity
     type: object
-  dto.UpdateProductRequest:
+  http.UpdateProductRequest:
     properties:
       description:
         maxLength: 1000
@@ -86,12 +86,12 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/dto.ProductResponse'
+              $ref: '#/definitions/http.ProductResponse'
             type: array
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
       summary: List products
       tags:
       - products
@@ -105,26 +105,26 @@ paths:
         name: product
         required: true
         schema:
-          $ref: '#/definitions/dto.CreateProductRequest'
+          $ref: '#/definitions/http.CreateProductRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/dto.ProductResponse'
+            $ref: '#/definitions/http.ProductResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create a product
@@ -148,15 +148,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete a product
@@ -176,15 +176,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ProductResponse'
+            $ref: '#/definitions/http.ProductResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
       summary: Get a product by ID
       tags:
       - products
@@ -204,30 +204,30 @@ paths:
         name: product
         required: true
         schema:
-          $ref: '#/definitions/dto.UpdateProductRequest'
+          $ref: '#/definitions/http.UpdateProductRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ProductResponse'
+            $ref: '#/definitions/http.ProductResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update a product
@@ -249,30 +249,30 @@ paths:
         name: reserve
         required: true
         schema:
-          $ref: '#/definitions/dto.ReserveStockRequest'
+          $ref: '#/definitions/http.ReserveStockRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ProductResponse'
+            $ref: '#/definitions/http.ProductResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
       summary: Reserve product stock
       tags:
       - products

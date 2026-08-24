@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/domain"
-	port "github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/ports"
+	port "github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/port"
 )
 
 type ProductService struct {

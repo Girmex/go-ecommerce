@@ -1,16 +1,15 @@
-package routers
+package http
 
 import (
 	"net/http"
 
 	_ "github.com/Girmex/go-ecommerce-app/chi-microservice/product/docs"
-	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/adapters/http/handlers"
-	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/adapters/http/middleware"
+	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/adapter/http/middleware"
 	"github.com/go-chi/chi/v5"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
-func NewRouter(productHandler *handlers.Handler, jwtSecret string) http.Handler {
+func NewRouter(productHandler *Handler, jwtSecret string) http.Handler {
 	r := chi.NewRouter()
 
 	r.Get("/swagger/*", httpSwagger.Handler(

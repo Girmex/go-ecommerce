@@ -5,9 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	httpHandler "github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/adapters/http/handlers"
-	routers "github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/adapters/http/routers"
-	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/adapters/persistence"
+	httpHandler "github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/adapter/http"
+	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/adapter/persistence"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/application"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/config"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/database"
@@ -60,7 +59,7 @@ func main() {
 	handler := httpHandler.NewHandler(productService)
 
 	// HTTP router
-	router := routers.NewRouter(
+	router := httpHandler.NewRouter(
 		handler,
 		cfg.JwtSecret,
 	)

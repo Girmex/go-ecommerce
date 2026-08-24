@@ -1,4 +1,4 @@
-package handlers
+package http
 
 import (
 	"encoding/json"
@@ -8,10 +8,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
 
-	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/adapters/http/dto"
-	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/adapters/http/middleware"
+	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/adapter/http/middleware"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/domain"
-	"github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/ports"
+	ports "github.com/Girmex/go-ecommerce-app/chi-microservice/product/internal/port"
 )
 
 type Handler struct {
@@ -32,12 +31,12 @@ func NewHandler(productService ports.ProductService) *Handler {
 // @Tags         products
 // @Accept       json
 // @Produce      json
-// @Param        product  body      dto.CreateProductRequest  true  "Product payload"
+// @Param        product  body      CreateProductRequest  true  "Product payload"
 // @Security     BearerAuth
-// @Success      201      {object}  dto.ProductResponse
-// @Failure      400      {object}  dto.ErrorResponse
-// @Failure      401      {object}  dto.ErrorResponse
-// @Failure      500      {object}  dto.ErrorResponse
+// @Success      201      {object}  ProductResponse
+// @Failure      400      {object}  ErrorResponse
+// @Failure      401      {object}  ErrorResponse
+// @Failure      500      {object}  ErrorResponse
 // @Router       /products [post]
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	userID, ok := middleware.UserID(r.Context())
@@ -51,7 +50,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req dto.CreateProductRequest
+	var req CreateProductRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(
@@ -96,7 +95,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(
 		w,
 		http.StatusCreated,
-		dto.ToProductResponse(product),
+		ToProductResponse(product),
 	)
 }
 
@@ -106,9 +105,9 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 // @Tags         products
 // @Produce      json
 // @Param        id  path      string  true  "Product ID"
-// @Success      200  {object}  dto.ProductResponse
-// @Failure      404  {object}  dto.ErrorResponse
-// @Failure      500  {object}  dto.ErrorResponse
+// @Success      200  {object}  ProductResponse
+// @Failure      404  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
 // @Router       /products/{id} [get]
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
@@ -137,7 +136,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 	writeJSON(
 		w,
 		http.StatusOK,
-		dto.ToProductResponse(product),
+		ToProductResponse(product),
 	)
 }
 
@@ -146,8 +145,8 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 // @Description  Returns all products.
 // @Tags         products
 // @Produce      json
-// @Success      200  {array}   dto.ProductResponse
-// @Failure      500  {object}  dto.ErrorResponse
+// @Success      200  {array}   ProductResponse
+// @Failure      500  {object}  ErrorResponse
 // @Router       /products [get]
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	products, err := h.productService.List(r.Context())
@@ -161,12 +160,12 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := make([]dto.ProductResponse, 0, len(products))
+	response := make([]ProductResponse, 0, len(products))
 
 	for _, product := range products {
 		response = append(
 			response,
-			dto.ToProductResponse(product),
+			ToProductResponse(product),
 		)
 	}
 
@@ -180,13 +179,13 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 // @Accept       json
 // @Produce      json
 // @Param        id       path      string                  true  "Product ID"
-// @Param        product  body      dto.UpdateProductRequest true  "Product fields"
+// @Param        product  body      UpdateProductRequest true  "Product fields"
 // @Security     BearerAuth
-// @Success      200      {object}  dto.ProductResponse
-// @Failure      400      {object}  dto.ErrorResponse
-// @Failure      401      {object}  dto.ErrorResponse
-// @Failure      404      {object}  dto.ErrorResponse
-// @Failure      500      {object}  dto.ErrorResponse
+// @Success      200      {object}  ProductResponse
+// @Failure      400      {object}  ErrorResponse
+// @Failure      401      {object}  ErrorResponse
+// @Failure      404      {object}  ErrorResponse
+// @Failure      500      {object}  ErrorResponse
 // @Router       /products/{id} [put]
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	userID, ok := middleware.UserID(r.Context())
@@ -202,7 +201,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 
 	id := chi.URLParam(r, "id")
 
-	var req dto.UpdateProductRequest
+	var req UpdateProductRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(
@@ -258,7 +257,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	writeJSON(
 		w,
 		http.StatusOK,
-		dto.ToProductResponse(product),
+		ToProductResponse(product),
 	)
 }
 
@@ -270,9 +269,9 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 // @Param        id  path  string  true  "Product ID"
 // @Security     BearerAuth
 // @Success      204  "No Content"
-// @Failure      401  {object}  dto.ErrorResponse
-// @Failure      404  {object}  dto.ErrorResponse
-// @Failure      500  {object}  dto.ErrorResponse
+// @Failure      401  {object}  ErrorResponse
+// @Failure      404  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
 // @Router       /products/{id} [delete]
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 	userID, ok := middleware.UserID(r.Context())
@@ -324,17 +323,17 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 // @Accept       json
 // @Produce      json
 // @Param        id       path      string                   true  "Product ID"
-// @Param        reserve  body      dto.ReserveStockRequest true  "Stock reservation"
-// @Success      200      {object}  dto.ProductResponse
-// @Failure      400      {object}  dto.ErrorResponse
-// @Failure      404      {object}  dto.ErrorResponse
-// @Failure      409      {object}  dto.ErrorResponse
-// @Failure      500      {object}  dto.ErrorResponse
+// @Param        reserve  body      ReserveStockRequest true  "Stock reservation"
+// @Success      200      {object}  ProductResponse
+// @Failure      400      {object}  ErrorResponse
+// @Failure      404      {object}  ErrorResponse
+// @Failure      409      {object}  ErrorResponse
+// @Failure      500      {object}  ErrorResponse
 // @Router       /products/{id}/reserve [post]
 func (h *Handler) ReserveStock(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
-	var req dto.ReserveStockRequest
+	var req ReserveStockRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(
@@ -394,7 +393,7 @@ func (h *Handler) ReserveStock(w http.ResponseWriter, r *http.Request) {
 	writeJSON(
 		w,
 		http.StatusOK,
-		dto.ToProductResponse(product),
+		ToProductResponse(product),
 	)
 }
 
@@ -414,7 +413,7 @@ func writeError(
 	writeJSON(
 		w,
 		status,
-		dto.ErrorResponse{
+		ErrorResponse{
 			Code:    code,
 			Message: message,
 		},
