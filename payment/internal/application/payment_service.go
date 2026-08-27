@@ -49,8 +49,17 @@ func (s *PaymentService) Charge(
 
 	result, err := s.gateway.Charge(
 		ctx,
-		input.Amount,
-		input.Method,
+		port.GatewayChargeInput{
+			Amount:      input.Amount,
+			Currency:    input.Currency,
+			Reference:   payment.ID,
+			Email:       input.Email,
+			FirstName:   input.FirstName,
+			LastName:    input.LastName,
+			PhoneNumber: input.PhoneNumber,
+			CallbackURL: input.CallbackURL,
+			ReturnURL:   input.ReturnURL,
+		},
 	)
 	if err != nil {
 		return nil, err

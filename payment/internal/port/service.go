@@ -7,10 +7,17 @@ import (
 )
 
 type ChargeInput struct {
-	OrderID string
-	UserID  uint
-	Amount  float64
-	Method  string
+	OrderID     string
+	UserID      uint
+	Amount      float64
+	Method      string
+	Currency    string
+	Email       string
+	FirstName   string
+	LastName    string
+	PhoneNumber string
+	CallbackURL string
+	ReturnURL   string
 }
 
 type PaymentService interface {

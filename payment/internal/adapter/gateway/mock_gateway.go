@@ -18,18 +18,18 @@ func NewMockGateway() *MockGateway {
 
 func (g *MockGateway) Charge(
 	_ context.Context,
-	amount float64,
-	_ string,
+	input port.GatewayChargeInput,
 ) (port.GatewayChargeResult, error) {
 
-	if amount <= 0 {
+	if input.Amount <= 0 {
 		return port.GatewayChargeResult{
 			Approved: false,
 		}, nil
 	}
 
 	return port.GatewayChargeResult{
-		Approved: true,
-		TxnRef:   "txn_" + uuid.NewString(),
+		Approved:    true,
+		TxnRef:      "txn_" + uuid.NewString(),
+		CheckoutURL: "",
 	}, nil
 }
