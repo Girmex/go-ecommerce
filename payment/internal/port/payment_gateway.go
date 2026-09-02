@@ -15,7 +15,6 @@ type GatewayChargeInput struct {
 }
 
 type GatewayChargeResult struct {
-	Approved    bool
 	TxnRef      string
 	CheckoutURL string
 }

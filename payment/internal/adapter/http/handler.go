@@ -29,17 +29,17 @@ func NewPaymentHandler(
 
 // Charge godoc
 // @Summary      Charge a payment for an order
-// @Description  Creates a payment and attempts to charge it through the payment gateway.
+// @Description  Creates a payment and initializes the payment gateway checkout.
 // @Tags         payments
 // @Accept       json
 // @Produce      json
 // @Param        payment  body      ChargeRequest  true  "Charge payload"
 // @Security     BearerAuth
 // @Success      201      {object}  PaymentResponse
-// @Failure      400      {object}  ErrorResponse
-// @Failure      401      {object}  ErrorResponse
-// @Failure      402      {object}  ErrorResponse
-// @Failure      500      {object}  ErrorResponse
+// @Failure      400      {object} ErrorResponse
+// @Failure      401      {object} ErrorResponse
+// @Failure      402      {object} ErrorResponse
+// @Failure      500      {object} ErrorResponse
 // @Router       /payments [post]
 func (h *PaymentHandler) Charge(
 	w http.ResponseWriter,
@@ -108,10 +108,13 @@ func (h *PaymentHandler) Charge(
 		return
 	}
 
+	response := toPaymentResponse(payment.Payment)
+	response.CheckoutURL = payment.CheckoutURL
+
 	writeJSON(
 		w,
 		http.StatusCreated,
-		toPaymentResponse(payment),
+		response,
 	)
 }
 
@@ -212,6 +215,7 @@ func (h *PaymentHandler) List(
 	payments, err := h.paymentService.List(
 		r.Context(),
 	)
+
 	if err != nil {
 		writeError(
 			w,

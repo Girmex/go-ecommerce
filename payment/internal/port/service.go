@@ -20,8 +20,13 @@ type ChargeInput struct {
 	ReturnURL   string
 }
 
+type ChargeResult struct {
+	Payment     *domain.Payment
+	CheckoutURL string
+}
+
 type PaymentService interface {
-	Charge(ctx context.Context, input ChargeInput) (*domain.Payment, error)
+	Charge(ctx context.Context, input ChargeInput) (*ChargeResult, error)
 	Get(ctx context.Context, id string) (*domain.Payment, error)
 	List(ctx context.Context) ([]*domain.Payment, error)
 	Refund(ctx context.Context, id string) (*domain.Payment, error)

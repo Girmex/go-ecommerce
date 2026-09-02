@@ -28,21 +28,22 @@ func NewPaymentService(
 func (s *PaymentService) Charge(
 	ctx context.Context,
 	input port.ChargeInput,
-) (*domain.Payment, error) {
+) (*port.ChargeResult, error) {
 
 	now := time.Now().UTC()
 
 	payment := &domain.Payment{
-		ID:            uuid.NewString(),
-		OrderID:       input.OrderID,
-		UserID:        input.UserID,
-		Amount:        input.Amount,
-		Method:        input.Method,
-		Status:        domain.StatusPending,
-		CreatedAt:     now,
-		UpdatedAt:     now,
+		ID:        uuid.NewString(),
+		OrderID:   input.OrderID,
+		UserID:    input.UserID,
+		Amount:    input.Amount,
+		Method:    input.Method,
+		Status:    domain.StatusPending,
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 
+	// Save the payment as PENDING before contacting the gateway.
 	if err := s.repository.Create(ctx, payment); err != nil {
 		return nil, err
 	}
@@ -65,38 +66,31 @@ func (s *PaymentService) Charge(
 		return nil, err
 	}
 
+	// Gateway initialization does NOT mean the payment was completed.
+	// The payment remains PENDING until verification/webhook processing.
+	payment.GatewayTxnRef = result.TxnRef
 	payment.UpdatedAt = time.Now().UTC()
-
-	if result.Approved {
-		payment.Status = domain.StatusPaid
-		payment.GatewayTxnRef = result.TxnRef
-	} else {
-		payment.Status = domain.StatusDeclined
-	}
 
 	if err := s.repository.Update(ctx, payment); err != nil {
 		return nil, err
 	}
 
-	if !result.Approved {
-		return payment, domain.ErrPaymentDeclined
-	}
-
-	return payment, nil
+	return &port.ChargeResult{
+		Payment:     payment,
+		CheckoutURL: result.CheckoutURL,
+	}, nil
 }
 
 func (s *PaymentService) Get(
 	ctx context.Context,
 	id string,
 ) (*domain.Payment, error) {
-
 	return s.repository.GetByID(ctx, id)
 }
 
 func (s *PaymentService) List(
 	ctx context.Context,
 ) ([]*domain.Payment, error) {
-
 	return s.repository.List(ctx)
 }
 

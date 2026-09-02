@@ -22,13 +22,10 @@ func (g *MockGateway) Charge(
 ) (port.GatewayChargeResult, error) {
 
 	if input.Amount <= 0 {
-		return port.GatewayChargeResult{
-			Approved: false,
-		}, nil
+		return port.GatewayChargeResult{}, nil
 	}
 
 	return port.GatewayChargeResult{
-		Approved:    true,
 		TxnRef:      "txn_" + uuid.NewString(),
 		CheckoutURL: "",
 	}, nil

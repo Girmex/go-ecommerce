@@ -12,17 +12,17 @@ type ChargeRequest struct {
 }
 
 type PaymentResponse struct {
-	ID            string  `json:"id"`
-	OrderID       string  `json:"order_id"`
-	UserID        uint    `json:"user_id"`
+	ID            string `json:"id"`
+	OrderID       string `json:"order_id"`
+	UserID        uint   `json:"user_id"`
 	Amount        float64 `json:"amount"`
-	Method        string  `json:"method"`
-	Status        string  `json:"status"`
-	GatewayTxnRef string  `json:"gateway_txn_ref,omitempty"`
-	CreatedAt     string  `json:"created_at"`
-	UpdatedAt     string  `json:"updated_at"`
+	Method        string `json:"method"`
+	Status        string `json:"status"`
+	GatewayTxnRef string `json:"gateway_txn_ref,omitempty"`
+	CheckoutURL   string `json:"checkout_url,omitempty"`
+	CreatedAt     string `json:"created_at"`
+	UpdatedAt     string `json:"updated_at"`
 }
-
 type ErrorResponse struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`

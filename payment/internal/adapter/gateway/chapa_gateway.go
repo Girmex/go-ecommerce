@@ -51,14 +51,24 @@ type chapaInitializeResponse struct {
 	} `json:"data"`
 }
 
-func (g *ChapaGateway) Charge(ctx context.Context, input port.GatewayChargeInput) (port.GatewayChargeResult, error) {
+func (g *ChapaGateway) Charge(
+	ctx context.Context,
+	input port.GatewayChargeInput,
+) (port.GatewayChargeResult, error) {
+
 	if input.Amount <= 0 {
-		return port.GatewayChargeResult{Approved: false}, errors.New("amount must be greater than zero")
+		return port.GatewayChargeResult{},
+			errors.New("amount must be greater than zero")
+	}
+
+	currency := input.Currency
+	if currency == "" {
+		currency = "ETB"
 	}
 
 	reqBody := chapaInitializeRequest{
 		Amount:      fmt.Sprintf("%.2f", input.Amount),
-		Currency:    input.Currency,
+		Currency:    currency,
 		Email:       input.Email,
 		FirstName:   input.FirstName,
 		LastName:    input.LastName,
@@ -68,18 +78,21 @@ func (g *ChapaGateway) Charge(ctx context.Context, input port.GatewayChargeInput
 		ReturnURL:   input.ReturnURL,
 	}
 
-	if reqBody.Currency == "" {
-		reqBody.Currency = "ETB"
-	}
-
 	reqBytes, err := json.Marshal(reqBody)
 	if err != nil {
-		return port.GatewayChargeResult{Approved: false}, fmt.Errorf("failed to marshal request: %w", err)
+		return port.GatewayChargeResult{},
+			fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, g.baseURL+"/transaction/initialize", bytes.NewBuffer(reqBytes))
+	req, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodPost,
+		g.baseURL+"/transaction/initialize",
+		bytes.NewBuffer(reqBytes),
+	)
 	if err != nil {
-		return port.GatewayChargeResult{Approved: false}, fmt.Errorf("failed to create request: %w", err)
+		return port.GatewayChargeResult{},
+			fmt.Errorf("failed to create request: %w", err)
 	}
 
 	req.Header.Set("Authorization", "Bearer "+g.secretKey)
@@ -87,30 +100,47 @@ func (g *ChapaGateway) Charge(ctx context.Context, input port.GatewayChargeInput
 
 	resp, err := g.client.Do(req)
 	if err != nil {
-		return port.GatewayChargeResult{Approved: false}, fmt.Errorf("failed to send request: %w", err)
+		return port.GatewayChargeResult{},
+			fmt.Errorf("failed to send request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return port.GatewayChargeResult{Approved: false}, fmt.Errorf("failed to read response: %w", err)
+		return port.GatewayChargeResult{},
+			fmt.Errorf("failed to read response: %w", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return port.GatewayChargeResult{Approved: false}, fmt.Errorf("chapa API returned status %d: %s", resp.StatusCode, string(body))
+		return port.GatewayChargeResult{},
+			fmt.Errorf(
+				"chapa API returned status %d: %s",
+				resp.StatusCode,
+				string(body),
+			)
 	}
 
 	var chapaResp chapaInitializeResponse
+
 	if err := json.Unmarshal(body, &chapaResp); err != nil {
-		return port.GatewayChargeResult{Approved: false}, fmt.Errorf("failed to unmarshal response: %w", err)
+		return port.GatewayChargeResult{},
+			fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
 	if chapaResp.Status != "success" {
-		return port.GatewayChargeResult{Approved: false}, fmt.Errorf("chapa initialization failed: %s", chapaResp.Message)
+		return port.GatewayChargeResult{},
+			fmt.Errorf(
+				"chapa initialization failed: %s",
+				chapaResp.Message,
+			)
+	}
+
+	if chapaResp.Data.CheckoutURL == "" {
+		return port.GatewayChargeResult{},
+			errors.New("chapa returned an empty checkout URL")
 	}
 
 	return port.GatewayChargeResult{
-		Approved:    true,
 		TxnRef:      input.Reference,
 		CheckoutURL: chapaResp.Data.CheckoutURL,
 	}, nil
