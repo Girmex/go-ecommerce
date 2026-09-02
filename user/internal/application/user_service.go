@@ -17,13 +17,13 @@ var (
 )
 
 type UserService struct {
-	repository   ports.UserRepository
-	tokenService ports.TokenService
+	repository   port.UserRepository
+	tokenService port.TokenService
 }
 
 func NewUserService(
-	repository ports.UserRepository,
-	tokenService ports.TokenService,
+	repository port.UserRepository,
+	tokenService port.TokenService,
 ) *UserService {
 	return &UserService{
 		repository:   repository,

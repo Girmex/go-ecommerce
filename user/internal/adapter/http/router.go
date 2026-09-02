@@ -11,7 +11,7 @@ import (
 
 func NewRouter(
 	handler *Handler,
-	tokenService ports.TokenService,
+	tokenService port.TokenService,
 ) *chi.Mux {
 	r := chi.NewRouter()
 
