@@ -15,6 +15,7 @@ import (
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/payment/internal/application"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/payment/internal/config"
 	"github.com/Girmex/go-ecommerce-app/chi-microservice/payment/internal/database"
+	"github.com/Girmex/go-ecommerce-app/chi-microservice/payment/internal/port"
 
 	_ "github.com/Girmex/go-ecommerce-app/chi-microservice/payment/docs"
 )
@@ -65,7 +66,14 @@ func main() {
 	// Payment Gateway
 	// ------------------------------------------------------------
 
-	paymentGateway := gateway.NewMockGateway()
+	var paymentGateway port.PaymentGateway
+	if cfg.ChapaSecretKey != "" {
+		paymentGateway = gateway.NewChapaGateway(cfg.ChapaSecretKey)
+		log.Println("using chapa payment gateway")
+	} else {
+		paymentGateway = gateway.NewMockGateway()
+		log.Println("using mock payment gateway")
+	}
 
 	// ------------------------------------------------------------
 	// Persistence
