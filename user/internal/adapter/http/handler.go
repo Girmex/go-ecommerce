@@ -18,7 +18,8 @@ type Handler struct {
 }
 
 type ErrorResponse struct {
-	Message string `json:"message"`
+	Message          string       `json:"message"`
+	ValidationErrors []FieldError `json:"validation_errors,omitempty"`
 }
 
 func NewHandler(userService *application.UserService) *Handler {
@@ -66,34 +67,7 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.validator.Struct(req); err != nil {
-		validationErr := err.(validator.ValidationErrors)[0]
-
-		switch validationErr.Field() {
-		case "Name":
-			if validationErr.Tag() == "required" {
-				writeError(w, http.StatusBadRequest, "name is required")
-			} else {
-				writeError(w, http.StatusBadRequest, "name must be at least 2 characters")
-			}
-
-		case "Email":
-			if validationErr.Tag() == "required" {
-				writeError(w, http.StatusBadRequest, "email is required")
-			} else {
-				writeError(w, http.StatusBadRequest, "email must be a valid email address")
-			}
-
-		case "Password":
-			if validationErr.Tag() == "required" {
-				writeError(w, http.StatusBadRequest, "password is required")
-			} else {
-				writeError(w, http.StatusBadRequest, "password must be at least 8 characters")
-			}
-
-		default:
-			writeError(w, http.StatusBadRequest, "invalid user data")
-		}
-
+		writeValidationError(w, err)
 		return
 	}
 
@@ -151,7 +125,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.validator.Struct(req); err != nil {
-		writeError(w, http.StatusBadRequest, "invalid login data")
+		writeValidationError(w, err)
 		return
 	}
 

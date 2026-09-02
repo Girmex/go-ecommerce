@@ -69,12 +69,7 @@ func (h *PaymentHandler) Charge(
 	}
 
 	if err := h.validator.Struct(req); err != nil {
-		writeError(
-			w,
-			http.StatusBadRequest,
-			"VALIDATION_ERROR",
-			"request failed validation",
-		)
+		writeValidationError(w, err)
 		return
 	}
 

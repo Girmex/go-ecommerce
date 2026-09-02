@@ -35,8 +35,9 @@ type ProductResponse struct {
 }
 
 type ErrorResponse struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
+	Code             string       `json:"code"`
+	Message          string       `json:"message"`
+	ValidationErrors []FieldError `json:"validation_errors,omitempty"`
 }
 
 func ToProductResponse(p *domain.Product) ProductResponse {

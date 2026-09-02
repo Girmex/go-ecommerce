@@ -53,13 +53,7 @@ func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.validator.Struct(req); err != nil {
-		writeError(
-			w,
-			http.StatusBadRequest,
-			"VALIDATION_ERROR",
-			"request failed validation",
-			err.Error(),
-		)
+		writeValidationError(w, err)
 		return
 	}
 

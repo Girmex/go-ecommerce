@@ -63,12 +63,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.validator.Struct(req); err != nil {
-		writeError(
-			w,
-			http.StatusBadRequest,
-			"VALIDATION_ERROR",
-			"request failed validation",
-		)
+		writeValidationError(w, err)
 		return
 	}
 
@@ -214,12 +209,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.validator.Struct(req); err != nil {
-		writeError(
-			w,
-			http.StatusBadRequest,
-			"VALIDATION_ERROR",
-			"request failed validation",
-		)
+		writeValidationError(w, err)
 		return
 	}
 
@@ -346,12 +336,7 @@ func (h *Handler) ReserveStock(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.validator.Struct(req); err != nil {
-		writeError(
-			w,
-			http.StatusBadRequest,
-			"VALIDATION_ERROR",
-			"request failed validation",
-		)
+		writeValidationError(w, err)
 		return
 	}
 

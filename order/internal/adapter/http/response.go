@@ -6,9 +6,10 @@ import (
 )
 
 type ErrorResponse struct {
-	Code    string      `json:"code"`
-	Message string      `json:"message"`
-	Details any         `json:"details,omitempty"`
+	Code             string       `json:"code"`
+	Message          string       `json:"message"`
+	Details          any          `json:"details,omitempty"`
+	ValidationErrors []FieldError `json:"validation_errors,omitempty"`
 }
 
 func writeJSON(w http.ResponseWriter, status int, data any) {
