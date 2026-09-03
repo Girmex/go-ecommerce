@@ -59,7 +59,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Creates a payment and attempts to charge it through the payment gateway.",
+                "description": "Creates a payment and initializes the payment gateway checkout.",
                 "consumes": [
                     "application/json"
                 ],
@@ -259,6 +259,23 @@ const docTemplate = `{
                 },
                 "message": {
                     "type": "string"
+                },
+                "validation_errors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.FieldError"
+                    }
+                }
+            }
+        },
+        "http.FieldError": {
+            "type": "object",
+            "properties": {
+                "field": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
                 }
             }
         },
@@ -267,6 +284,9 @@ const docTemplate = `{
             "properties": {
                 "amount": {
                     "type": "number"
+                },
+                "checkout_url": {
+                    "type": "string"
                 },
                 "created_at": {
                     "type": "string"

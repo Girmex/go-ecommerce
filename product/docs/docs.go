@@ -359,6 +359,23 @@ const docTemplate = `{
                 },
                 "message": {
                     "type": "string"
+                },
+                "validation_errors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.FieldError"
+                    }
+                }
+            }
+        },
+        "http.FieldError": {
+            "type": "object",
+            "properties": {
+                "field": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
                 }
             }
         },

@@ -37,6 +37,17 @@ definitions:
       details: {}
       message:
         type: string
+      validation_errors:
+        items:
+          $ref: '#/definitions/http.FieldError'
+        type: array
+    type: object
+  http.FieldError:
+    properties:
+      field:
+        type: string
+      message:
+        type: string
     type: object
   http.OrderItemResponse:
     properties:

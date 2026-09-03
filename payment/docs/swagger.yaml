@@ -30,11 +30,24 @@ definitions:
         type: string
       message:
         type: string
+      validation_errors:
+        items:
+          $ref: '#/definitions/http.FieldError'
+        type: array
+    type: object
+  http.FieldError:
+    properties:
+      field:
+        type: string
+      message:
+        type: string
     type: object
   http.PaymentResponse:
     properties:
       amount:
         type: number
+      checkout_url:
+        type: string
       created_at:
         type: string
       gateway_txn_ref:
@@ -86,8 +99,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Creates a payment and attempts to charge it through the payment
-        gateway.
+      description: Creates a payment and initializes the payment gateway checkout.
       parameters:
       - description: Charge payload
         in: body
